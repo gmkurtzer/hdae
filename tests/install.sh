@@ -15,6 +15,35 @@ PROJECT=$TEST_ROOT/project
 mkdir -p "$PROJECT"
 git -C "$PROJECT" init -q
 
+# Incompatible update and link modes must fail before changing the target.
+UPDATE_LINK_PROJECT=$TEST_ROOT/update-link-project
+mkdir -p "$UPDATE_LINK_PROJECT"
+git -C "$UPDATE_LINK_PROJECT" init -q
+if HDAE_REPOSITORY_URL=$REPOSITORY_ROOT \
+    "$REPOSITORY_ROOT/install.sh" --target "$UPDATE_LINK_PROJECT" --all --update --link \
+    >"$TEST_ROOT/update-link.out" 2>&1; then
+    echo 'update and link modes were accepted together' >&2
+    exit 1
+fi
+grep -q -- '--link cannot be combined with --update or --version' \
+    "$TEST_ROOT/update-link.out"
+test ! -e "$UPDATE_LINK_PROJECT/.hdae"
+test ! -e "$UPDATE_LINK_PROJECT/.agents"
+test ! -e "$UPDATE_LINK_PROJECT/.claude"
+
+# Discovery conflicts must be detected before any installation state changes.
+CONFLICT_PROJECT=$TEST_ROOT/conflict-project
+mkdir -p "$CONFLICT_PROJECT/.claude/skills/pr-issue-review"
+git -C "$CONFLICT_PROJECT" init -q
+if "$REPOSITORY_ROOT/install.sh" --target "$CONFLICT_PROJECT" --all --copy \
+    >"$TEST_ROOT/conflict.out" 2>&1; then
+    echo 'discovery conflict did not stop installation' >&2
+    exit 1
+fi
+grep -q 'discovery path already exists' "$TEST_ROOT/conflict.out"
+test ! -e "$CONFLICT_PROJECT/.hdae"
+test ! -e "$CONFLICT_PROJECT/.agents"
+
 "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy
 
 test -f "$PROJECT/.hdae/manifest"
@@ -30,6 +59,31 @@ test -f "$PROJECT/.agents/skills/hdae-development/SKILL.md"
 # The installed entry point must also support an idempotent local reinstall.
 "$PROJECT/.hdae/install.sh" --target "$PROJECT" --all --copy
 grep -q '^version=0.1.1$' "$PROJECT/.hdae/manifest"
+
+# Added symlinks, including their targets, are part of the managed tree digest.
+ln -s SKILL.md "$PROJECT/.hdae/skills/hdae-development/local-link"
+if "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy \
+    >"$TEST_ROOT/symlink.out" 2>&1; then
+    echo 'added skill symlink was not detected' >&2
+    exit 1
+fi
+rm "$PROJECT/.hdae/skills/hdae-development/local-link"
+
+# Per-file hash utility formatting must not affect the recorded tree digest.
+FORMAT_GNU_PROJECT=$TEST_ROOT/format-gnu-project
+FORMAT_OPENSSL_PROJECT=$TEST_ROOT/format-openssl-project
+mkdir -p "$FORMAT_GNU_PROJECT" "$FORMAT_OPENSSL_PROJECT"
+git -C "$FORMAT_GNU_PROJECT" init -q
+git -C "$FORMAT_OPENSSL_PROJECT" init -q
+PATH="$REPOSITORY_ROOT/tests/fixtures/bin:$PATH" HDAE_TEST_HASH_FORMAT=gnu \
+    "$REPOSITORY_ROOT/install.sh" --target "$FORMAT_GNU_PROJECT" --codex --copy \
+    >"$TEST_ROOT/format-gnu.out"
+PATH="$REPOSITORY_ROOT/tests/fixtures/bin:$PATH" HDAE_TEST_HASH_FORMAT=openssl \
+    "$REPOSITORY_ROOT/install.sh" --target "$FORMAT_OPENSSL_PROJECT" --codex --copy \
+    >"$TEST_ROOT/format-openssl.out"
+gnu_digest=$(sed -n 's/^skills_digest=//p' "$FORMAT_GNU_PROJECT/.hdae/manifest")
+openssl_digest=$(sed -n 's/^skills_digest=//p' "$FORMAT_OPENSSL_PROJECT/.hdae/manifest")
+test "$gnu_digest" = "$openssl_digest"
 
 # Local changes must prevent an implicit replacement.
 printf '\nlocal test change\n' >>"$PROJECT/.hdae/skills/hdae-development/SKILL.md"

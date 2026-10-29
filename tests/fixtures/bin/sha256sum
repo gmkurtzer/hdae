@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -eu
+
+# Remove this fixture directory so the selected command resolves to a real
+# system SHA-256 implementation.
+PATH=${PATH#*:}
+export PATH
+
+hash_file() {
+    file=$1
+    if command -v sha256sum >/dev/null 2>&1; then
+        sha256sum "$file" | awk '{print $1}'
+    elif command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 "$file" | awk '{print $1}'
+    elif command -v openssl >/dev/null 2>&1; then
+        openssl dgst -sha256 "$file" | awk '{print $NF}'
+    else
+        echo 'no system SHA-256 implementation found' >&2
+        exit 1
+    fi
+}
+
+if [ "$#" -eq 0 ]; then
+    if command -v sha256sum >/dev/null 2>&1; then
+        exec sha256sum
+    elif command -v shasum >/dev/null 2>&1; then
+        exec shasum -a 256
+    elif command -v openssl >/dev/null 2>&1; then
+        exec openssl dgst -sha256
+    fi
+    echo 'no system SHA-256 implementation found' >&2
+    exit 1
+fi
+
+for file in "$@"; do
+    hash=$(hash_file "$file")
+    case ${HDAE_TEST_HASH_FORMAT:-gnu} in
+        gnu) printf '%s  %s\n' "$hash" "$file" ;;
+        openssl) printf 'SHA2-256(%s)= %s\n' "$file" "$hash" ;;
+        *) echo "unknown test hash format: $HDAE_TEST_HASH_FORMAT" >&2; exit 1 ;;
+    esac
+done

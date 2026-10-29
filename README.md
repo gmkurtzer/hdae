@@ -115,7 +115,10 @@ Copy the complete directory, including `SKILL.md`, `agents/`, and
 
 `--update` downloads from `https://github.com/gmkurtzer/hdae.git`. Local
 changes are detected using the recorded skill checksum and block replacement
-unless `--force` is supplied. The installer never runs project code.
+unless `--force` is supplied. Checksums include regular-file content and
+symlink targets and are portable across the supported SHA-256 tools. Link mode
+always uses the current checkout, so `--link` cannot be combined with `--update`
+or `--version`. The installer never runs project code.
 
 ## Use HDAE
 

@@ -68,16 +68,15 @@ tree_digest() {
     [ -d "$directory" ] || die "cannot checksum missing directory: $directory"
     (
         cd "$directory"
-        find . -type f -print | LC_ALL=C sort | while IFS= read -r file; do
-            printf '%s\n' "$file"
-            if command -v sha256sum >/dev/null 2>&1; then
-                sha256sum "$file"
-            elif command -v shasum >/dev/null 2>&1; then
-                shasum -a 256 "$file"
-            elif command -v openssl >/dev/null 2>&1; then
-                openssl dgst -sha256 "$file"
+        find . \( -type f -o -type l \) -print | LC_ALL=C sort | while IFS= read -r file; do
+            if [ -L "$file" ]; then
+                printf 'link %s\n' "$file"
+                readlink "$file"
             else
-                die "a SHA-256 tool is required (sha256sum, shasum, or openssl)"
+                # Preserve the historical sha256sum/shasum record format while
+                # normalizing the hash utility output itself.
+                printf '%s\n' "$file"
+                printf '%s  %s\n' "$(sha256_stream <"$file")" "$file"
             fi
         done
     ) | sha256_stream
@@ -141,6 +140,10 @@ done
 
 if [ -n "$VERSION" ]; then
     UPDATE=1
+fi
+
+if [ "$MODE" = link ] && [ "$UPDATE" -eq 1 ]; then
+    die "--link cannot be combined with --update or --version; update the checkout separately"
 fi
 
 if [ -z "$TARGET" ]; then
@@ -216,6 +219,44 @@ if [ "$MODE" = link ]; then
     SKILLS_ROOT=$SOURCE_ROOT/skills
     INSTALLED_VERSION=${VERSION:-$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')}
 else
+    SKILLS_ROOT=$HDAE_DIR/skills
+    INSTALLED_VERSION=${VERSION:-$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')}
+fi
+
+desired_link() {
+    skill=$1
+    if [ "$MODE" = copy ]; then
+        printf '../../.hdae/skills/%s\n' "$skill"
+    else
+        printf '%s/%s\n' "$SKILLS_ROOT" "$skill"
+    fi
+}
+
+validate_link() {
+    agent_dir=$1
+    skill=$2
+    destination=$agent_dir/skills/$skill
+    desired=$(desired_link "$skill")
+
+    if [ -e "$destination" ] || [ -L "$destination" ]; then
+        if [ -L "$destination" ] && [ "$(readlink "$destination")" = "$desired" ]; then
+            return
+        fi
+        die "discovery path already exists: $destination"
+    fi
+}
+
+if [ "$INSTALL_CODEX" -eq 1 ]; then
+    validate_link "$TARGET/.agents" hdae-development
+    validate_link "$TARGET/.agents" pr-issue-review
+fi
+
+if [ "$INSTALL_CLAUDE" -eq 1 ]; then
+    validate_link "$TARGET/.claude" hdae-development
+    validate_link "$TARGET/.claude" pr-issue-review
+fi
+
+if [ "$MODE" = copy ]; then
     if [ -d "$HDAE_DIR/skills" ]; then
         recorded_digest=$(manifest_value skills_digest "$MANIFEST" || true)
         current_digest=$(tree_digest "$HDAE_DIR/skills")
@@ -239,8 +280,6 @@ else
     if [ -f "$SOURCE_ROOT/VERSION" ] && [ "$SOURCE_ROOT/VERSION" != "$HDAE_DIR/VERSION" ]; then
         cp "$SOURCE_ROOT/VERSION" "$HDAE_DIR/VERSION"
     fi
-    SKILLS_ROOT=$HDAE_DIR/skills
-    INSTALLED_VERSION=${VERSION:-$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')}
 fi
 
 install_link() {
@@ -249,11 +288,7 @@ install_link() {
     mkdir -p "$agent_dir/skills"
     destination=$agent_dir/skills/$skill
 
-    if [ "$MODE" = copy ]; then
-        desired=../../.hdae/skills/$skill
-    else
-        desired=$SKILLS_ROOT/$skill
-    fi
+    desired=$(desired_link "$skill")
 
     if [ -e "$destination" ] || [ -L "$destination" ]; then
         if [ -L "$destination" ] && [ "$(readlink "$destination")" = "$desired" ]; then
