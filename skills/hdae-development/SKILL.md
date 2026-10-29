@@ -69,6 +69,24 @@ not yet possible, say why and identify the checkpoint at which it can be
 reassessed. Update the plan and estimate when evidence changes; do not present
 speculation as a commitment.
 
+## Converge without spinning
+
+Continue the autonomous inner loop while the approved gate is incomplete, the
+next action remains in scope, and each cycle has a credible chance of producing
+measurable progress or new evidence. Never repeat an unchanged attempt. Every
+retry must change a hypothesis, input, implementation, environment, or
+diagnostic and explain why that change could help.
+
+When an approach stalls, preserve what was tried and choose a materially
+different in-scope action with the highest expected information value. Stop and
+return to the human when a required decision, credential, permission, or
+dependency is missing; remaining alternatives would expand scope or risk;
+repeated cycles produce no new evidence or progress; expected time or token cost
+is disproportionate to the gate; or no credible in-scope alternative remains.
+Report the attempts, evidence, alternatives, and recommendation, and persist the
+checkpoint. Difficulty alone is not a blocker; exhaust sensible bounded
+alternatives first.
+
 ## Mandatory gate alignment
 
 Before implementation, align the gates with the human. Skip this only when the
@@ -162,8 +180,8 @@ assessing the project process.
    commands. If any of those are missing, return to gate alignment.
 2. Reproduce the current behavior or missing capability when practical.
 3. Implement the narrowest coherent change that can satisfy the gate.
-4. Iterate autonomously within that boundary: build, run, observe, diagnose,
-   revise, and rerun.
+4. Iterate autonomously within that boundary under the convergence rules:
+   build, run, observe, diagnose, revise, and rerun.
 5. Keep the human informed at the promised checkpoints. Update task status,
    plan, risks, and ETA when actual evidence changes them.
 6. Turn discovered regressions into repeatable tests rather than fixing only

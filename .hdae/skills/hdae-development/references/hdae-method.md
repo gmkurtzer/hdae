@@ -236,6 +236,44 @@ The agent may repeat the inner loop without hand-holding while it remains inside
 the approved gate. It returns to the outer loop when the gate passes, a human
 decision is required, or continued iteration would weaken scope or evidence.
 
+## Convergence and stall control
+
+An autonomous cycle is productive only when its next action remains inside the
+approved gate and has a credible chance of producing measurable progress or new
+evidence. Use this decision loop:
+
+```text
+observe -> form a hypothesis -> choose the highest-information in-scope action
+        -> run it -> compare the result -> record the evidence and next action
+```
+
+Do not repeat an unchanged attempt. A retry must deliberately change at least
+one hypothesis, input, implementation, environment, or diagnostic, with a
+reason that the change could alter the result. When the current approach stalls,
+retain its evidence and try a materially different in-scope alternative. Prefer
+the action that is most likely to discriminate between explanations or remove a
+known blocker, rather than the action that merely consumes more work.
+
+Stop the inner loop and return to the human when any of these conditions holds:
+
+- a required decision, credential, permission, or external dependency is
+  missing;
+- the remaining alternatives would expand approved scope, risk, authority, or
+  consequential external effects;
+- repeated materially different cycles yield no new evidence or measurable
+  progress;
+- the expected time or token cost is disproportionate to the gate's value or
+  remaining uncertainty;
+- no credible in-scope alternative remains; or
+- the gate has passed and reached its human-review boundary.
+
+Difficulty, an initial failure, or an uncertain diagnosis is not by itself a
+reason to stop. Exhaust sensible bounded alternatives first. At escalation,
+persist the current checkpoint and report what was attempted, what each result
+showed, which alternatives remain, why the loop stopped, and the recommended
+human decision or next action. Resume from that checkpoint after direction; do
+not silently cross the gate boundary or broaden the plan.
+
 ## Completion language
 
 - **Passed:** all mandatory criteria ran and succeeded.

@@ -103,6 +103,10 @@ Scope:
   or explicit uncertainty;
 - distinguish technical passage from human acceptance;
 - require clean completion summaries and relevant source/copy reconciliation;
+- require productive autonomous cycles, materially changed retries, and
+  highest-information in-scope alternatives;
+- stop and escalate with a durable checkpoint when progress, authority, or
+  proportional resource use no longer supports another cycle;
 - validate and synchronize the packaged skill.
 
 Non-goals: prescribe large planning artifacts for small tasks, guarantee exact
@@ -116,6 +120,11 @@ Task list:
 - [x] Strengthen gate templates, execution checkpoints, and completion reports.
 - [x] Validate and synchronize the skill package.
 - [x] Run repository checks and prepare the commit for human acceptance.
+- [x] Define when autonomous execution continues and prohibit unchanged retries.
+- [x] Define materially different alternatives and information-seeking actions.
+- [x] Define bounded stopping conditions and the escalation report.
+- [x] Revalidate and synchronize the convergence amendment.
+- [x] Prepare the convergence amendment for a signed-off commit.
 
 Acceptance requires skill validation, canonical/installed file comparison,
 `make check`, `git diff --check`, a clean committed working tree, and a final
@@ -125,5 +134,7 @@ Fresh evidence: the skill validator passed for both canonical and installed
 copies; `diff -qr` confirmed those copies match; `make check` passed syntax,
 ShellCheck, and the full installer integration suite; and `git diff --check`
 passed. The forward, reverse, coverage, and orphan review found no unmapped
-Gate 2 requirement, task, or acceptance criterion. No technical acceptance
-criteria remain open.
+Gate 2 requirement, task, or acceptance criterion. The convergence amendment
+also passed validation for both skill copies, canonical/installed comparison,
+the full repository check suite, and `git diff --check`. No technical acceptance
+criteria remain open; human acceptance is still required.
