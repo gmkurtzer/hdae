@@ -164,7 +164,7 @@ if [ "$UNINSTALL" -eq 1 ]; then
     remove_managed_link "$TARGET/.claude/skills/hdae-development" "../../.hdae/skills/hdae-development"
     remove_managed_link "$TARGET/.claude/skills/pr-issue-review" "../../.hdae/skills/pr-issue-review"
     rm -rf "$HDAE_DIR/skills"
-    rm -f "$HDAE_DIR/install.sh" "$MANIFEST"
+    rm -f "$HDAE_DIR/install.sh" "$HDAE_DIR/VERSION" "$MANIFEST"
     rmdir "$HDAE_DIR" 2>/dev/null || true
     printf 'Removed installer-managed HDAE skills from %s\n' "$TARGET"
     exit 0
@@ -232,8 +232,13 @@ else
     cp -R "$SOURCE_ROOT/skills/pr-issue-review" "$stage/"
     rm -rf "$HDAE_DIR/skills"
     mv "$stage" "$HDAE_DIR/skills"
-    cp "$SOURCE_ROOT/install.sh" "$HDAE_DIR/install.sh"
-    chmod +x "$HDAE_DIR/install.sh"
+    if [ "$SOURCE_ROOT/install.sh" != "$HDAE_DIR/install.sh" ]; then
+        cp "$SOURCE_ROOT/install.sh" "$HDAE_DIR/install.sh"
+        chmod +x "$HDAE_DIR/install.sh"
+    fi
+    if [ -f "$SOURCE_ROOT/VERSION" ] && [ "$SOURCE_ROOT/VERSION" != "$HDAE_DIR/VERSION" ]; then
+        cp "$SOURCE_ROOT/VERSION" "$HDAE_DIR/VERSION"
+    fi
     SKILLS_ROOT=$HDAE_DIR/skills
     INSTALLED_VERSION=${VERSION:-$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')}
 fi

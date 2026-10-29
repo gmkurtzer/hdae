@@ -27,6 +27,10 @@ test -f "$PROJECT/.agents/skills/hdae-development/SKILL.md"
 # Reinstalling an unchanged managed copy must be idempotent.
 "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy
 
+# The installed entry point must also support an idempotent local reinstall.
+"$PROJECT/.hdae/install.sh" --target "$PROJECT" --all --copy
+grep -q '^version=0.1.1$' "$PROJECT/.hdae/manifest"
+
 # Local changes must prevent an implicit replacement.
 printf '\nlocal test change\n' >>"$PROJECT/.hdae/skills/hdae-development/SKILL.md"
 if "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy \

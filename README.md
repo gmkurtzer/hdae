@@ -37,7 +37,7 @@ Python is not required.
 From the root of the project that should use HDAE:
 
 ```sh
-git clone --depth 1 --branch v0.1.0 https://github.com/gmkurtzer/hdae.git .hdae-source
+git clone --depth 1 --branch v0.1.1 https://github.com/gmkurtzer/hdae.git .hdae-source
 ./.hdae-source/install.sh --all --copy
 rm -rf .hdae-source
 ```
@@ -53,9 +53,6 @@ discovery links:
 
 Commit `.hdae/`, `.agents/skills/`, and `.claude/skills/` with the project so
 every contributor and CI checkout receives the same skill version.
-
-Until the first release is tagged, replace `--branch v0.1.0` with
-`--branch main`.
 
 ### Interactive installation
 
