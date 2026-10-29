@@ -53,6 +53,22 @@ arrive with a completed brief or fill out a template.
 Prefer one to three related questions at a time. Explain why a question changes
 the architecture, scope, or acceptance criteria when that is not obvious.
 
+## Discuss the plan before work
+
+Before doing task work, discuss the plan with the human. At minimum, state the
+intended outcome, work to perform, scope and non-goals, acceptance evidence, and
+stopping point. This discussion always occurs; scale its detail to the work. A
+small task may need only a short summary, while a long project needs explicit
+goals, an ordered plan, dependencies, gates, and a task list with current
+statuses.
+
+For work expected to take a long time, tell the human when the autonomous inner
+loop will begin, what it will cover, and when progress checkpoints will occur.
+Give an ETA range and confidence when evidence supports one. If a useful ETA is
+not yet possible, say why and identify the checkpoint at which it can be
+reassessed. Update the plan and estimate when evidence changes; do not present
+speculation as a commitment.
+
 ## Mandatory gate alignment
 
 Before implementation, align the gates with the human. Skip this only when the
@@ -65,8 +81,10 @@ gate and its acceptance criteria.
    acceptance. Ask only questions that could change scope or a gate.
 3. Inspect the relevant repository and existing evidence before finalizing the
    plan.
-4. Present a proposed gate map. For every gate show its outcome, included and
-   excluded work, dependencies, acceptance evidence, and stopping point.
+4. Present a proposed gate map in plain, concrete language. For every gate show
+   its goal, observable outcome, included and excluded work, dependencies,
+   deliverables, acceptance evidence, and stopping point. For substantial work,
+   also show the ordered plan and task list that implement the gates.
 5. Perform a coverage review across functionality, failure behavior,
    regression testing, user workflow, documentation, compatibility or
    migration, and operational or security concerns when relevant. Mark a
@@ -90,6 +108,8 @@ write or update durable repository files covering:
 - project intent, users, outcomes, scope, and non-goals;
 - architecture, constraints, invariants, and important decisions;
 - milestone and gate map with status, dependencies, and acceptance criteria;
+- for long projects, traceability from goals through gates, criteria, tasks, and
+  evidence, plus a record of approved scope changes;
 - the active checkpoint: current gate, evidence, limitations, open questions,
   required human decisions, and exact next action.
 
@@ -98,6 +118,11 @@ Use existing project conventions when possible. For a small project, one
 structure, propose `docs/hdae/PROJECT.md`, `ARCHITECTURE.md`, `PLAN.md`, and
 `STATUS.md`. Create only the files the project needs and link them rather than
 duplicating content.
+
+For substantial or long-running work, read
+[references/hdae-method.md](references/hdae-method.md) and use its scalable
+planning, traceability, and completeness-audit guidance. Do not rely on a chat
+plan or transient task UI as the authoritative project record.
 
 At the beginning of every resumed task or after a context shift, read the
 repository instructions and these authoritative HDAE files before proposing or
@@ -139,15 +164,22 @@ assessing the project process.
 3. Implement the narrowest coherent change that can satisfy the gate.
 4. Iterate autonomously within that boundary: build, run, observe, diagnose,
    revise, and rerun.
-5. Turn discovered regressions into repeatable tests rather than fixing only
+5. Keep the human informed at the promised checkpoints. Update task status,
+   plan, risks, and ETA when actual evidence changes them.
+6. Turn discovered regressions into repeatable tests rather than fixing only
    the visible symptom.
-6. Preserve failures, limitations, commands, and material decisions as evidence.
-7. Reconcile every deliverable and acceptance criterion against fresh evidence,
-   including documentation and user-facing behavior. Do not declare the gate
-   complete because its main code path works.
-8. Update the persisted gate status, evidence, open questions, and next action.
-9. Stop at the gate boundary and let the human accept, reject, redirect, or
-   reprioritize the next work.
+7. Preserve failures, limitations, commands, and material decisions as evidence.
+8. Reconcile every deliverable and acceptance criterion against fresh evidence,
+   including documentation and user-facing behavior. For long projects, perform
+   the reference's forward, reverse, coverage, and orphan checks. Do not declare
+   the gate complete because its main code path works.
+9. Reconcile source, generated, vendored, and installed copies when relevant;
+   inspect documentation, repository state, commits, and temporary artifacts.
+10. Update the persisted gate status, evidence, open questions, and next action.
+11. Present a completion summary naming delivered work, evidence, coverage,
+    repository state, remaining work, and the exact human decision required.
+    Stop at the gate boundary and let the human accept, reject, redirect, or
+    reprioritize the next work.
 
 Return immediately for human direction when work would change the architecture,
 expand product scope, weaken an acceptance criterion, require consequential
@@ -158,6 +190,8 @@ external action, or choose among materially different product outcomes.
 Verify observable behavior from a clean and relevant state. A gate is
 **passed** only when every mandatory criterion ran and succeeded; otherwise use
 **failed**, **blocked**, **not run**, or **partial** precisely.
+**Accepted** is separate: it means the human reviewed and accepted a passed
+gate. Never imply that technical passage is human acceptance.
 
 For maintenance, connect each issue or request to the authoritative product and
 architecture documents. Add the smallest gate that reproduces the problem,

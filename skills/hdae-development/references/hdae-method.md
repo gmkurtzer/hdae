@@ -51,10 +51,54 @@ the project needs them, but do not create documents for ceremony:
 - **Architecture:** components, boundaries, invariants, trust, and decisions.
 - **Plan:** milestones, dependencies, and order.
 - **Gate:** one bounded unit of authorized work and its acceptance criteria.
+- **Task:** one trackable action mapped to an approved gate and criterion.
 - **Evidence:** commands, environment, observations, failures, and status.
 - **Decision record:** a durable explanation for consequential choices.
 
 Link to authoritative material rather than duplicating it.
+
+## Scale planning to the work
+
+Every task needs a plan discussion before execution, but not every task needs a
+large planning system. For a small, bounded change, a concise outcome, scope,
+verification, and stop point may be sufficient. For a long project, persist:
+
+- explicit goals and non-goals;
+- an ordered gate map with dependencies;
+- a task list with pending, active, blocked, and completed states;
+- acceptance criteria and required evidence;
+- progress checkpoints, risks, decisions, and scope changes; and
+- the current next action.
+
+Before starting a long execution loop, tell the human what will run, its scope,
+and when progress will be reported. Give an ETA range and confidence only when
+there is enough evidence. Otherwise state the uncertainty and the checkpoint
+that should make an estimate possible. Revise estimates when observations
+invalidate them.
+
+## Traceability and completeness for long projects
+
+Use stable identifiers when they reduce ambiguity. Maintain the relationship:
+
+```text
+Goal -> Gate -> Acceptance criterion -> Task -> Evidence
+```
+
+Every goal must be covered by one or more gates. Every acceptance criterion
+must have planned work and fresh evidence. Every task must belong to an approved
+gate and criterion; new tasks that expand scope require a gate update and human
+approval. Record removed or changed scope with its reason instead of silently
+deleting it.
+
+At planning and completion boundaries, perform four checks:
+
+1. **Forward:** every goal reaches acceptance criteria, tasks, and evidence.
+2. **Reverse:** every task and change maps to approved scope.
+3. **Coverage:** every relevant functional, failure, regression, user,
+   documentation, compatibility, operational, and security surface is included
+   or explicitly not applicable.
+4. **Orphan:** no goal, criterion, task, decision, failure, or open question is
+   left unmapped or silently dropped.
 
 ## Durable context and continuation
 
@@ -140,11 +184,17 @@ the gate partial.
 
 Status: proposed | approved | in progress | passed | failed | blocked
 
+### Goal
+<Plain-language user or project outcome this gate advances.>
+
 ### Purpose
 <User, product, architectural, or risk reason.>
 
 ### Scope
 - <Authorized work>
+
+### Dependencies
+- <Required prior gate, input, or decision>
 
 ### Non-goals
 - <Deferred or prohibited work>
@@ -159,6 +209,9 @@ Status: proposed | approved | in progress | passed | failed | blocked
 
 ### Evidence
 - `<command or procedure>` -> <required observation>
+
+### Task list
+- [ ] <Task mapped to an acceptance criterion; include for substantial work>
 
 ### Stop
 Stop for human review before beginning <dependent work>.
@@ -186,9 +239,15 @@ decision is required, or continued iteration would weaken scope or evidence.
 ## Completion language
 
 - **Passed:** all mandatory criteria ran and succeeded.
+- **Accepted:** the human reviewed and accepted a passed gate.
 - **Failed:** at least one mandatory criterion ran and failed.
 - **Blocked:** an external dependency or required decision prevents execution.
 - **Not run:** verification has not occurred.
 - **Partial:** useful progress exists, but the gate remains open.
 
 Time spent, code volume, or near-success does not complete a gate.
+
+At a gate boundary, report the gate and status first, then delivered work,
+evidence, coverage, repository or artifact state, incomplete or unverified
+items, and the exact decision or next action required from the human. Passing a
+gate never silently authorizes the next one.

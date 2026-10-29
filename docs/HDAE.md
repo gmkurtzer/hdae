@@ -41,9 +41,9 @@ No acceptance criteria remain open. The human accepted the gate.
 Make the primary user workflow a one-command curl-to-shell installation from
 `main`, while retaining the pinned release workflow for reproducibility.
 
-## Active gate: curl-to-shell installation
+## Completed gate: curl-to-shell installation
 
-Status: passed
+Status: accepted
 
 Outcome: a user can run the documented curl command from a clean project and
 receive a complete copy installation for Codex and Claude Code.
@@ -76,3 +76,54 @@ Fresh evidence: `make check`, `cmp -s install.sh .hdae/install.sh`, and
 installation into a clean Git project, ignored a decoy target `skills/`
 directory, created both agents' discovery links, and reinstalled through the
 copied entry point. No technical acceptance criteria remain open.
+
+The human accepted the gate.
+
+## Goal: clear and scalable HDAE execution
+
+Make every HDAE plan understandable before work begins, preserve complete
+goals, gates, tasks, and evidence across long projects, and give users honest
+duration expectations and clean completion reports.
+
+## Active gate: HDAE workflow refinement
+
+Status: passed
+
+Outcome: HDAE scales from a concise small-task plan to a durable long-project
+system without losing scope, work, decisions, or evidence.
+
+Scope:
+
+- require a plan discussion before execution and plain-language gates;
+- require goals, ordered plans, task states, dependencies, and checkpoints for
+  long projects;
+- add goal-to-evidence traceability, scope-change records, and forward, reverse,
+  coverage, and orphan audits;
+- communicate execution-loop scope, checkpoints, and evidence-based ETA ranges
+  or explicit uncertainty;
+- distinguish technical passage from human acceptance;
+- require clean completion summaries and relevant source/copy reconciliation;
+- validate and synchronize the packaged skill.
+
+Non-goals: prescribe large planning artifacts for small tasks, guarantee exact
+completion times, change skill invocation policy, release, or push.
+
+Task list:
+
+- [x] Add proportional pre-work plan and duration communication.
+- [x] Add durable long-project planning and traceability.
+- [x] Add completeness audits and explicit scope-change control.
+- [x] Strengthen gate templates, execution checkpoints, and completion reports.
+- [x] Validate and synchronize the skill package.
+- [x] Run repository checks and prepare the commit for human acceptance.
+
+Acceptance requires skill validation, canonical/installed file comparison,
+`make check`, `git diff --check`, a clean committed working tree, and a final
+summary that clearly distinguishes passed from accepted.
+
+Fresh evidence: the skill validator passed for both canonical and installed
+copies; `diff -qr` confirmed those copies match; `make check` passed syntax,
+ShellCheck, and the full installer integration suite; and `git diff --check`
+passed. The forward, reverse, coverage, and orphan review found no unmapped
+Gate 2 requirement, task, or acceptance criterion. No technical acceptance
+criteria remain open.
