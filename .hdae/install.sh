@@ -3,6 +3,13 @@
 set -eu
 
 PROGRAM=${0##*/}
+STDIN_INSTALL=0
+case "$PROGRAM" in
+    sh|dash|bash|ksh|zsh)
+        STDIN_INSTALL=1
+        PROGRAM=hdae-install
+        ;;
+esac
 REPOSITORY_URL=${HDAE_REPOSITORY_URL:-https://github.com/gmkurtzer/hdae.git}
 TARGET=
 INSTALL_CODEX=0
@@ -189,11 +196,17 @@ if [ "$INSTALL_CODEX" -eq 0 ] && [ "$INSTALL_CLAUDE" -eq 0 ]; then
     fi
 fi
 
-SCRIPT_DIR=$(absolute_dir "$(dirname "$0")")
-SOURCE_ROOT=$SCRIPT_DIR
-SOURCE_LABEL=$SCRIPT_DIR
+if [ "$STDIN_INSTALL" -eq 1 ]; then
+    SCRIPT_DIR=
+    SOURCE_ROOT=
+    SOURCE_LABEL=standard-input
+else
+    SCRIPT_DIR=$(absolute_dir "$(dirname "$0")")
+    SOURCE_ROOT=$SCRIPT_DIR
+    SOURCE_LABEL=$SCRIPT_DIR
+fi
 
-if [ "$UPDATE" -eq 1 ] || [ ! -d "$SOURCE_ROOT/skills/hdae-development" ]; then
+if [ "$UPDATE" -eq 1 ] || [ -z "$SOURCE_ROOT" ] || [ ! -d "$SOURCE_ROOT/skills/hdae-development" ]; then
     command -v git >/dev/null 2>&1 || die "git is required to fetch HDAE"
     TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/hdae.XXXXXX")
     ref=${VERSION:-main}

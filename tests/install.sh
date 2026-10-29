@@ -44,6 +44,31 @@ grep -q 'discovery path already exists' "$TEST_ROOT/conflict.out"
 test ! -e "$CONFLICT_PROJECT/.hdae"
 test ! -e "$CONFLICT_PROJECT/.agents"
 
+# The documented curl-to-shell path must install from standard input without
+# treating files in the target project as the installer source.
+STDIN_SOURCE=$TEST_ROOT/stdin-source
+mkdir -p "$STDIN_SOURCE"
+cp -R "$REPOSITORY_ROOT/skills" "$REPOSITORY_ROOT/install.sh" \
+    "$REPOSITORY_ROOT/VERSION" "$STDIN_SOURCE/"
+git -C "$STDIN_SOURCE" init -q
+git -C "$STDIN_SOURCE" checkout -q -b main
+git -C "$STDIN_SOURCE" add skills install.sh VERSION
+git -C "$STDIN_SOURCE" -c user.name=HDAE -c user.email=hdae@example.invalid \
+    commit -q -m 'test source'
+
+STDIN_PROJECT=$TEST_ROOT/stdin-project
+mkdir -p "$STDIN_PROJECT/skills/hdae-development" \
+    "$STDIN_PROJECT/skills/pr-issue-review"
+git -C "$STDIN_PROJECT" init -q
+HDAE_REPOSITORY_URL=$STDIN_SOURCE sh -s -- --target "$STDIN_PROJECT" --all --copy \
+    <"$REPOSITORY_ROOT/install.sh" >"$TEST_ROOT/stdin.out"
+test -f "$STDIN_PROJECT/.hdae/manifest"
+test -f "$STDIN_PROJECT/.agents/skills/hdae-development/SKILL.md"
+test -f "$STDIN_PROJECT/.claude/skills/pr-issue-review/SKILL.md"
+grep -q "source=$STDIN_SOURCE@main" "$STDIN_PROJECT/.hdae/manifest"
+"$STDIN_PROJECT/.hdae/install.sh" --target "$STDIN_PROJECT" --all --copy \
+    >"$TEST_ROOT/stdin-reinstall.out"
+
 "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy
 
 test -f "$PROJECT/.hdae/manifest"

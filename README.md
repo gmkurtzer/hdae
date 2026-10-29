@@ -25,6 +25,7 @@ The skill directories under [`skills/`](skills/) are the canonical source.
 Installation uses a POSIX shell and these common tools:
 
 - `git`
+- `curl` for the recommended installation command
 - `cp`, `find`, `sort`, and `tar`
 - `sha256sum`, `shasum`, or `openssl` for SHA-256 checksums
 
@@ -32,14 +33,22 @@ Python is not required.
 
 ## Install into another project
 
-### Recommended: clone and install a pinned release
+### Recommended: install the latest version
 
 From the root of the project that should use HDAE:
 
 ```sh
-git clone --depth 1 --branch v0.1.1 https://github.com/gmkurtzer/hdae.git .hdae-source
-./.hdae-source/install.sh --all --copy
-rm -rf .hdae-source
+curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | sh
+```
+
+The downloaded installer fetches HDAE from `main`, installs both skills into
+the current project, and configures discovery for Codex and Claude Code. To
+select only one agent or another target, pass installer arguments through
+`sh -s --`, for example:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
+    sh -s -- --codex --copy --target /path/to/project
 ```
 
 The installer copies the canonical skills into `.hdae/skills/`, records their
@@ -53,6 +62,20 @@ discovery links:
 
 Commit `.hdae/`, `.agents/skills/`, and `.claude/skills/` with the project so
 every contributor and CI checkout receives the same skill version.
+
+### Reproducible pinned installation
+
+To inspect and pin the exact release before running it:
+
+```sh
+git clone --depth 1 --branch v0.1.1 https://github.com/gmkurtzer/hdae.git .hdae-source
+./.hdae-source/install.sh --all --copy
+rm -rf .hdae-source
+```
+
+The curl command tracks `main`; use this pinned workflow when reproducibility
+or source review is more important than automatically selecting the latest
+version.
 
 ### Interactive installation
 
