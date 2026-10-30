@@ -180,8 +180,14 @@ and conventions; `STATUS.md` contains only the resumable active checkpoint.
 ## Scale planning to the work
 
 Every task needs a plan discussion before execution, but not every task needs a
-large planning system. For a small, bounded change, a concise outcome, scope,
-verification, and stop point may be sufficient. For a long project, persist:
+gate or a large planning system. For a small, bounded request expected to finish
+in one prompt or one near-single implementation-and-verification loop, use a
+concise outcome, scope, verification, and stop point without creating a gate.
+Use a gate when work is likely to require multiple loops or checkpoints, span a
+context compaction or handoff, or need durable scope, decision, task, and
+evidence tracking. If uncertain, ask the human whether the request should use
+an HDAE gate for iteration and review before creating one. For a long project,
+persist:
 
 - explicit goals and non-goals;
 - an ordered gate map with dependencies;
@@ -333,8 +339,9 @@ choice does not authorize pushing or opening a pull request.
 
 ## Human gate-alignment conversation
 
-The agent must make the proposed work visible enough for the human to find
-omissions before implementation. Use this sequence:
+After deciding that work requires a gate, the agent must make the proposed work
+visible enough for the human to find omissions before implementation. Use this
+sequence:
 
 1. summarize the intended outcome and constraints;
 2. ask focused questions whose answers could change architecture, scope, or

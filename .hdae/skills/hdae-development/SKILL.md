@@ -1,6 +1,6 @@
 ---
 name: hdae-development
-description: Apply Human-Directed Agentic Engineering by interviewing the human until the project is clear, persisting shared context, and planning, building, verifying, or maintaining software through human-approved gates and agent-executed loops. Use for substantial new or existing engineering work that needs durable architecture, milestones, evidence, and stopping points.
+description: Apply Human-Directed Agentic Engineering through proportional planning, agent-executed loops, and human-approved gates when durable control is needed. Use for substantial new or existing engineering work that needs clear architecture, milestones, evidence, and stopping points.
 ---
 
 # HDAE Development
@@ -12,8 +12,8 @@ that direction into artifacts and code, runs repeatable implementation and
 diagnosis loops, and presents evidence at agreed boundaries.
 
 HDAE is not continual approval of individual edits, and it is not unguided
-"vibe coding." Give the agent room to iterate inside an approved gate while
-returning architectural and product decisions to the human.
+"vibe coding." Give the agent room to iterate inside an approved request or
+gate while returning architectural and product decisions to the human.
 
 Read repository instructions and inspect the current project before proposing
 new structure. Preserve useful existing plans, tests, terminology, and decision
@@ -25,13 +25,14 @@ records rather than creating parallel documents.
   milestones, and executable gates.
 - **Implement:** execute the approved gate or ordered gate batch.
 - **Verify:** independently determine whether a gate passed.
-- **Maintain:** convert defects, requests, and operational evidence into new
-  bounded gates without losing the original architecture.
+- **Maintain:** handle bounded defects directly or convert larger defects,
+  requests, and operational evidence into gates without losing the original
+  architecture.
 - **Retrospective:** examine how direction, evidence, and iteration affected the
   outcome and improve the process.
 
-If the operation or current gate is unclear, establish it with the human before
-making substantial changes.
+If the operation or need for a gate is unclear, establish it with the human
+before making substantial changes.
 
 ## Discovery interview
 
@@ -69,13 +70,29 @@ not yet possible, say why and identify the checkpoint at which it can be
 reassessed. Update the plan and estimate when evidence changes; do not present
 speculation as a commitment.
 
+## Decide whether a gate is needed
+
+Not every request requires a gate. Do not create a gate for a small, bounded
+request that is reasonably expected to finish in one prompt or one near-single
+implementation-and-verification loop without surviving a context compaction,
+handoff, or later checkpoint. Discuss the concise plan, perform the work,
+verify it proportionally, and report the result without adding gate-ledger
+ceremony.
+
+Use a gate when the work is expected to need multiple implementation loops or
+human checkpoints, has a meaningful chance of spanning context compaction or
+handoff, or needs durable tracking of scope, decisions, tasks, and evidence.
+When the boundary is uncertain, ask the human whether to use an HDAE gate for
+iteration and review before creating one. Once a gate is chosen, complete gate
+alignment and review it with the human as required below.
+
 ## Converge without spinning
 
-Continue the autonomous inner loop while the approved gate is incomplete, the
-next action remains in scope, and each cycle has a credible chance of producing
-measurable progress or new evidence. Never repeat an unchanged attempt. Every
-retry must change a hypothesis, input, implementation, environment, or
-diagnostic and explain why that change could help.
+Continue the autonomous inner loop while the approved request or gate is
+incomplete, the next action remains in scope, and each cycle has a credible
+chance of producing measurable progress or new evidence. Never repeat an
+unchanged attempt. Every retry must change a hypothesis, input, implementation,
+environment, or diagnostic and explain why that change could help.
 
 When an approach stalls, preserve what was tried and choose a materially
 different in-scope action with the highest expected information value. Stop and
@@ -226,6 +243,7 @@ not ask again. Read the multi-gate procedure in
 
 ## Mandatory gate alignment
 
+This section applies only after the work has been determined to require a gate.
 Before implementation, align the gates with the human. Skip this only when the
 current conversation already contains explicit approval of the exact gate or
 batch, its acceptance criteria, and its checkpoint map.
@@ -371,9 +389,11 @@ fresh evidence that satisfied it. Technical passage alone leaves the file in
 `gates-done/`.
 
 For maintenance, connect each issue or request to the authoritative product and
-architecture documents. Add the smallest gate that reproduces the problem,
-protects the intended behavior, and records the decision. Do not let accumulated
-patches silently redefine the system.
+architecture documents. When the work meets the gate threshold, add the
+smallest gate that reproduces the problem, protects the intended behavior, and
+records the decision. Handle smaller bounded requests without a gate while
+still verifying the intended behavior. Do not let accumulated patches silently
+redefine the system.
 
 ## Retrospective
 
