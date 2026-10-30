@@ -43,6 +43,21 @@ test ! -e "$DEPRECATED_PROJECT/.hdae"
 test ! -e "$DEPRECATED_PROJECT/.agents"
 test ! -e "$DEPRECATED_PROJECT/.claude"
 
+# Development-link mode is intentionally unsupported and must fail before
+# changing the target.
+LINK_OPTION_PROJECT=$TEST_ROOT/link-option-project
+mkdir -p "$LINK_OPTION_PROJECT"
+git -C "$LINK_OPTION_PROJECT" init -q
+if "$REPOSITORY_ROOT/install.sh" --target "$LINK_OPTION_PROJECT" --all --link \
+    >"$TEST_ROOT/link-option.out" 2>&1; then
+    echo 'development-link mode was accepted' >&2
+    exit 1
+fi
+grep -q 'unknown option: --link' "$TEST_ROOT/link-option.out"
+test ! -e "$LINK_OPTION_PROJECT/.hdae"
+test ! -e "$LINK_OPTION_PROJECT/.agents"
+test ! -e "$LINK_OPTION_PROJECT/.claude"
+
 # Discovery conflicts must be detected before any installation state changes.
 CONFLICT_PROJECT=$TEST_ROOT/conflict-project
 mkdir -p "$CONFLICT_PROJECT/.claude/skills/pr-issue-review"
@@ -108,7 +123,10 @@ test -f "$STDIN_PROJECT/.hdae/manifest"
 test -f "$STDIN_PROJECT/.agents/skills/hdae-development/SKILL.md"
 test -f "$STDIN_PROJECT/.claude/skills/pr-issue-review/SKILL.md"
 test ! -e "$STDIN_PROJECT/.hdae/install.sh"
-grep -q '^installer_copy=0$' "$STDIN_PROJECT/.hdae/manifest"
+if grep -q '^installer_copy=' "$STDIN_PROJECT/.hdae/manifest"; then
+    echo 'manifest retained obsolete installer_copy metadata' >&2
+    exit 1
+fi
 grep -q "source=$STDIN_SOURCE@main" "$STDIN_PROJECT/.hdae/manifest"
 printf '\nupdate marker\n' \
     >>"$STDIN_SOURCE/skills/hdae-development/references/hdae-method.md"
@@ -131,7 +149,10 @@ test -L "$PROJECT/.agents/skills/hdae-development"
 test -L "$PROJECT/.claude/skills/pr-issue-review"
 test -f "$PROJECT/.agents/skills/hdae-development/SKILL.md"
 grep -q '^agents_bootstrap=1$' "$PROJECT/.hdae/manifest"
-grep -q '^installer_copy=0$' "$PROJECT/.hdae/manifest"
+if grep -q '^installer_copy=' "$PROJECT/.hdae/manifest"; then
+    echo 'manifest retained obsolete installer_copy metadata' >&2
+    exit 1
+fi
 grep -q '^# Project instructions$' "$PROJECT/AGENTS.md"
 grep -q '^Keep this user-authored instruction\.$' "$PROJECT/AGENTS.md"
 test "$(grep -Fxc '<!-- hdae:context-recovery:start -->' "$PROJECT/AGENTS.md")" -eq 1
@@ -157,40 +178,22 @@ test -L "$SELECTOR_PROJECT/.agents/skills/hdae-development"
 test -L "$SELECTOR_PROJECT/.claude/skills/hdae-development"
 test "$(find "$SELECTOR_PROJECT/.hdae/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')" -eq 2
 
-# An old manifest identifies the historical self-copy as installer-managed. A
-# new external reinstall removes it and records that future files are unowned.
+# A reinstall removes the historical installer self-copy and obsolete manifest
+# metadata unconditionally.
 LEGACY_PROJECT=$TEST_ROOT/legacy-project
 mkdir -p "$LEGACY_PROJECT"
 git -C "$LEGACY_PROJECT" init -q
 "$REPOSITORY_ROOT/install.sh" --target "$LEGACY_PROJECT" --codex --copy \
     >"$TEST_ROOT/legacy-initial.out"
-sed '/^installer_copy=0$/d' "$LEGACY_PROJECT/.hdae/manifest" \
-    >"$TEST_ROOT/legacy-manifest"
-cp "$TEST_ROOT/legacy-manifest" "$LEGACY_PROJECT/.hdae/manifest"
 cp "$REPOSITORY_ROOT/install.sh" "$LEGACY_PROJECT/.hdae/install.sh"
+printf '%s\n' 'installer_copy=1' >>"$LEGACY_PROJECT/.hdae/manifest"
 "$REPOSITORY_ROOT/install.sh" --target "$LEGACY_PROJECT" --codex --copy \
     >"$TEST_ROOT/legacy-migrate.out"
 test ! -e "$LEGACY_PROJECT/.hdae/install.sh"
-grep -q '^installer_copy=0$' "$LEGACY_PROJECT/.hdae/manifest"
-
-# A user-created file at the former path remains untouched once the manifest
-# records that HDAE no longer owns an installer copy, including on uninstall.
-PRESERVE_PROJECT=$TEST_ROOT/preserve-project
-mkdir -p "$PRESERVE_PROJECT/.hdae"
-git -C "$PRESERVE_PROJECT" init -q
-printf '%s\n' '# user-owned file' >"$PRESERVE_PROJECT/.hdae/install.sh"
-cp "$PRESERVE_PROJECT/.hdae/install.sh" "$TEST_ROOT/user-install.sh"
-"$REPOSITORY_ROOT/install.sh" --target "$PRESERVE_PROJECT" --codex --copy \
-    >"$TEST_ROOT/preserve-initial.out"
-cmp -s "$TEST_ROOT/user-install.sh" "$PRESERVE_PROJECT/.hdae/install.sh"
-"$REPOSITORY_ROOT/install.sh" --target "$PRESERVE_PROJECT" --codex --copy \
-    >"$TEST_ROOT/preserve-reinstall.out"
-cmp -s "$TEST_ROOT/user-install.sh" "$PRESERVE_PROJECT/.hdae/install.sh"
-"$REPOSITORY_ROOT/install.sh" --target "$PRESERVE_PROJECT" --uninstall \
-    >"$TEST_ROOT/preserve-uninstall.out"
-cmp -s "$TEST_ROOT/user-install.sh" "$PRESERVE_PROJECT/.hdae/install.sh"
-test ! -e "$PRESERVE_PROJECT/.hdae/manifest"
-test ! -e "$PRESERVE_PROJECT/.hdae/skills"
+if grep -q '^installer_copy=' "$LEGACY_PROJECT/.hdae/manifest"; then
+    echo 'legacy installer_copy metadata was not removed' >&2
+    exit 1
+fi
 
 # Local changes inside the installer-managed bootstrap must be protected.
 cp "$PROJECT/AGENTS.md" "$TEST_ROOT/agents-managed"
@@ -253,14 +256,21 @@ if grep -Fq '<!-- hdae:context-recovery:' "$PROJECT/AGENTS.md"; then
     exit 1
 fi
 
-# Link mode must expose both skills from a project-local HDAE checkout.
-LINK_PROJECT=$TEST_ROOT/link-project
-mkdir -p "$LINK_PROJECT/.hdae"
-git -C "$LINK_PROJECT" init -q
+# Running the installer from a separate source checkout performs the same
+# ordinary copy installation without placing the installer in the target.
+CHECKOUT_SOURCE=$TEST_ROOT/checkout-source
+CHECKOUT_PROJECT=$TEST_ROOT/checkout-project
+mkdir -p "$CHECKOUT_SOURCE" "$CHECKOUT_PROJECT"
+git -C "$CHECKOUT_PROJECT" init -q
 cp -R "$REPOSITORY_ROOT/skills" "$REPOSITORY_ROOT/install.sh" \
-    "$REPOSITORY_ROOT/VERSION" "$LINK_PROJECT/.hdae/"
-"$LINK_PROJECT/.hdae/install.sh" --target "$LINK_PROJECT" --all --link
-test -L "$LINK_PROJECT/.agents/skills/hdae-development"
-test -f "$LINK_PROJECT/.agents/skills/hdae-development/SKILL.md"
+    "$REPOSITORY_ROOT/VERSION" "$CHECKOUT_SOURCE/"
+"$CHECKOUT_SOURCE/install.sh" --target "$CHECKOUT_PROJECT" --all --copy \
+    >"$TEST_ROOT/checkout-install.out"
+test -d "$CHECKOUT_PROJECT/.hdae/skills/hdae-development"
+test ! -L "$CHECKOUT_PROJECT/.hdae/skills/hdae-development"
+test -L "$CHECKOUT_PROJECT/.agents/skills/hdae-development"
+test -L "$CHECKOUT_PROJECT/.claude/skills/pr-issue-review"
+test -f "$CHECKOUT_PROJECT/.agents/skills/hdae-development/SKILL.md"
+test ! -e "$CHECKOUT_PROJECT/.hdae/install.sh"
 
 echo 'HDAE installer tests passed'

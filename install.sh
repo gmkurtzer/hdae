@@ -14,7 +14,6 @@ REPOSITORY_URL=${HDAE_REPOSITORY_URL:-https://github.com/gmkurtzer/hdae.git}
 TARGET=
 INSTALL_CODEX=1
 INSTALL_CLAUDE=1
-MODE=copy
 UNINSTALL=0
 FORCE=0
 TEMP_DIR=
@@ -32,7 +31,6 @@ Install HDAE Agent Skills into a project.
   --codex             Compatibility alias for --all
   --claude            Compatibility alias for --all
   --copy              Copy skills into the target project (default)
-  --link              Link agents directly to this HDAE checkout
   --target DIRECTORY  Select the target project (default: Git root or cwd)
   --uninstall         Remove an installer-managed HDAE installation
   --force             Replace locally modified installed skills
@@ -183,8 +181,7 @@ for argument in "$@"; do
         --all) INSTALL_CODEX=1; INSTALL_CLAUDE=1 ;;
         --codex) INSTALL_CODEX=1; INSTALL_CLAUDE=1 ;;
         --claude) INSTALL_CODEX=1; INSTALL_CLAUDE=1 ;;
-        --copy) MODE=copy ;;
-        --link) MODE='link' ;;
+        --copy) ;;
         --update|--version)
             die "updates use the current main installer: curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | sh"
             ;;
@@ -201,7 +198,7 @@ while [ "$#" -gt 0 ]; do
             TARGET=$2
             shift 2
             ;;
-        --all|--codex|--claude|--copy|--link|--uninstall|--force)
+        --all|--codex|--claude|--copy|--uninstall|--force)
             shift
             ;;
         --help|-h)
@@ -221,11 +218,6 @@ fi
 TARGET=$(absolute_dir "$TARGET")
 HDAE_DIR=$TARGET/.hdae
 MANIFEST=$HDAE_DIR/manifest
-RECORDED_INSTALLER_COPY=$(manifest_value installer_copy "$MANIFEST" || true)
-LEGACY_INSTALLER_MANAGED=0
-if [ -f "$MANIFEST" ] && [ "$RECORDED_INSTALLER_COPY" != 0 ] && [ -f "$HDAE_DIR/install.sh" ]; then
-    LEGACY_INSTALLER_MANAGED=1
-fi
 
 if [ "$UNINSTALL" -eq 1 ]; then
     [ -f "$MANIFEST" ] || die "no installer-managed HDAE copy found in $TARGET"
@@ -246,9 +238,7 @@ if [ "$UNINSTALL" -eq 1 ]; then
         remove_agents_bootstrap
     fi
     rm -rf "$HDAE_DIR/skills"
-    if [ "$RECORDED_INSTALLER_COPY" != 0 ]; then
-        rm -f "$HDAE_DIR/install.sh"
-    fi
+    rm -f "$HDAE_DIR/install.sh"
     rm -f "$HDAE_DIR/VERSION" "$MANIFEST"
     rmdir "$HDAE_DIR" 2>/dev/null || true
     printf 'Removed installer-managed HDAE skills from %s\n' "$TARGET"
@@ -280,27 +270,11 @@ for skill in hdae-development pr-issue-review; do
     [ -f "$SOURCE_ROOT/skills/$skill/SKILL.md" ] || die "source is missing skill: $skill"
 done
 
-if [ "$MODE" = link ]; then
-    case "$SOURCE_ROOT" in
-        "$TARGET"/*) ;;
-        *)
-            printf '%s: warning: links to %s will not be portable with the project\n' "$PROGRAM" "$SOURCE_ROOT" >&2
-            ;;
-    esac
-    SKILLS_ROOT=$SOURCE_ROOT/skills
-    INSTALLED_VERSION=$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')
-else
-    SKILLS_ROOT=$HDAE_DIR/skills
-    INSTALLED_VERSION=$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')
-fi
+INSTALLED_VERSION=$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')
 
 desired_link() {
     skill=$1
-    if [ "$MODE" = copy ]; then
-        printf '../../.hdae/skills/%s\n' "$skill"
-    else
-        printf '%s/%s\n' "$SKILLS_ROOT" "$skill"
-    fi
+    printf '../../.hdae/skills/%s\n' "$skill"
 }
 
 validate_link() {
@@ -320,9 +294,7 @@ validate_link() {
 if [ "$INSTALL_CODEX" -eq 1 ]; then
     validate_link "$TARGET/.agents" hdae-development
     validate_link "$TARGET/.agents" pr-issue-review
-    if [ "$MODE" = copy ]; then
-        validate_agents_bootstrap
-    fi
+    validate_agents_bootstrap
 fi
 
 if [ "$INSTALL_CLAUDE" -eq 1 ]; then
@@ -330,29 +302,25 @@ if [ "$INSTALL_CLAUDE" -eq 1 ]; then
     validate_link "$TARGET/.claude" pr-issue-review
 fi
 
-if [ "$MODE" = copy ]; then
-    if [ -d "$HDAE_DIR/skills" ]; then
-        recorded_digest=$(manifest_value skills_digest "$MANIFEST" || true)
-        current_digest=$(tree_digest "$HDAE_DIR/skills")
-        if [ "$FORCE" -ne 1 ] && { [ -z "$recorded_digest" ] || [ "$recorded_digest" != "$current_digest" ]; }; then
-            die "installed skills were modified or are unmanaged; inspect them or rerun with --force"
-        fi
+if [ -d "$HDAE_DIR/skills" ]; then
+    recorded_digest=$(manifest_value skills_digest "$MANIFEST" || true)
+    current_digest=$(tree_digest "$HDAE_DIR/skills")
+    if [ "$FORCE" -ne 1 ] && { [ -z "$recorded_digest" ] || [ "$recorded_digest" != "$current_digest" ]; }; then
+        die "installed skills were modified or are unmanaged; inspect them or rerun with --force"
     fi
+fi
 
-    mkdir -p "$HDAE_DIR"
-    stage=$HDAE_DIR/skills.new.$$
-    rm -rf "$stage"
-    mkdir -p "$stage"
-    cp -R "$SOURCE_ROOT/skills/hdae-development" "$stage/"
-    cp -R "$SOURCE_ROOT/skills/pr-issue-review" "$stage/"
-    rm -rf "$HDAE_DIR/skills"
-    mv "$stage" "$HDAE_DIR/skills"
-    if [ "$LEGACY_INSTALLER_MANAGED" -eq 1 ]; then
-        rm -f "$HDAE_DIR/install.sh"
-    fi
-    if [ -f "$SOURCE_ROOT/VERSION" ] && [ "$SOURCE_ROOT/VERSION" != "$HDAE_DIR/VERSION" ]; then
-        cp "$SOURCE_ROOT/VERSION" "$HDAE_DIR/VERSION"
-    fi
+mkdir -p "$HDAE_DIR"
+stage=$HDAE_DIR/skills.new.$$
+rm -rf "$stage"
+mkdir -p "$stage"
+cp -R "$SOURCE_ROOT/skills/hdae-development" "$stage/"
+cp -R "$SOURCE_ROOT/skills/pr-issue-review" "$stage/"
+rm -rf "$HDAE_DIR/skills"
+mv "$stage" "$HDAE_DIR/skills"
+rm -f "$HDAE_DIR/install.sh"
+if [ -f "$SOURCE_ROOT/VERSION" ] && [ "$SOURCE_ROOT/VERSION" != "$HDAE_DIR/VERSION" ]; then
+    cp "$SOURCE_ROOT/VERSION" "$HDAE_DIR/VERSION"
 fi
 
 install_link() {
@@ -375,9 +343,7 @@ install_link() {
 if [ "$INSTALL_CODEX" -eq 1 ]; then
     install_link "$TARGET/.agents" hdae-development
     install_link "$TARGET/.agents" pr-issue-review
-    if [ "$MODE" = copy ]; then
-        install_agents_bootstrap
-    fi
+    install_agents_bootstrap
 fi
 
 if [ "$INSTALL_CLAUDE" -eq 1 ]; then
@@ -385,18 +351,15 @@ if [ "$INSTALL_CLAUDE" -eq 1 ]; then
     install_link "$TARGET/.claude" pr-issue-review
 fi
 
-if [ "$MODE" = copy ]; then
-    digest=$(tree_digest "$HDAE_DIR/skills")
-    cat >"$MANIFEST" <<EOF
+digest=$(tree_digest "$HDAE_DIR/skills")
+cat >"$MANIFEST" <<EOF
 version=$INSTALLED_VERSION
 source=$SOURCE_LABEL
 mode=copy
-installer_copy=0
 skills_digest=$digest
 agents_bootstrap=$BOOTSTRAP_MANAGED
 agents_bootstrap_digest=$(print_agents_bootstrap | sha256_stream)
 EOF
-fi
 
 printf 'HDAE %s installed in %s\n' "$INSTALLED_VERSION" "$TARGET"
 # The dollar sign below is Codex skill-invocation syntax, not a shell variable.
