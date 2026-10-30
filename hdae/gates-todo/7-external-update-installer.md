@@ -14,7 +14,9 @@ running the current `main` installer through a shell pipe.
   `.hdae/install.sh`.
 - Replace `--update` and `--version` usage with clear curl-to-shell guidance.
 - Teach the HDAE skill to update from GitHub `main`, preserve the configured
-  agent targets, and avoid Python or the obsolete installed entry point.
+  project target, ensure every supported agent discovery link, reload the
+  updated skill in context, and avoid Python or the obsolete installed entry
+  point.
 - Update documentation and installer integration tests.
 - Remove this repository's obsolete installed self-copy.
 
@@ -22,7 +24,8 @@ running the current `main` installer through a shell pipe.
 
 - Remove `install.sh` from a development checkout linked through `.hdae/`.
 - Add Python or another runtime dependency.
-- Change skill discovery paths, gate semantics, or release versions.
+- Add discovery paths for agents other than Codex and Claude Code.
+- Change gate semantics or release versions.
 - Release, tag, or push.
 
 ## Completed work
@@ -35,6 +38,8 @@ running the current `main` installer through a shell pipe.
 - [x] Updated README commands and explanations.
 - [x] Added regression coverage for install, migration, preservation, update,
   and uninstall behavior.
+- [x] Made every install/update repair Codex and Claude Code discovery links.
+- [x] Made the updating agent reload the updated skill and required references.
 - [x] Synchronized installed artifacts and ran all technical checks.
 - [x] Prepared the work for a signed-off commit.
 
@@ -51,8 +56,10 @@ running the current `main` installer through a shell pipe.
   new manifests preserve later user-created files at that path.
 - Deprecated `--update` and `--version` invocations fail before mutation and
   explain the shell-pipe replacement.
-- The HDAE skill contains the exact update workflow and preserves Codex/Claude
-  selection without requiring Python.
+- Every accepted agent selector ensures Codex and Claude Code both discover the
+  same `.hdae/skills` copies, and reinstall repairs a missing managed link.
+- The HDAE skill contains the exact update workflow, immediately reloads the
+  updated skill and required references, and does not require Python.
 - Development-link and uninstall behavior remain correct.
 - Canonical and installed skills validate and match; `make check` and
   `git diff --check` pass.
@@ -72,6 +79,10 @@ running the current `main` installer through a shell pipe.
   returned the curl-to-shell guidance.
 - Development-link, conflict, checksum, recovery-block, modified-copy, and
   uninstall regression coverage passed.
+- Selector compatibility tests proved `--codex` and `--claude` both create all
+  supported links, and reinstall repaired a deliberately removed managed link.
+- This turn reloaded the complete installed skill and required method reference
+  immediately after synchronization.
 - Both canonical and installed skills passed `quick_validate.py` and matched
   with `diff -qr`.
 - This repository migrated successfully: `.hdae/install.sh` is absent and its
@@ -79,6 +90,16 @@ running the current `main` installer through a shell pipe.
 - `make check` and `git diff --check` passed after synchronization.
 - Forward, reverse, coverage, and orphan review found no missing requirement,
   unrelated change, uncovered relevant path, or abandoned decision.
+
+## Delivery strategy
+
+- Working branch: current `main` branch.
+- Intended base: not applicable.
+- Pull request: not intended.
+- Planned commits: external-installer ownership; universal discovery-link
+  repair; HDAE reload and update-check guidance; final evidence and gate state.
+- Actual commits: `ae3010e` completed the external-installer ownership change;
+  remaining commits pending.
 
 ## Review policy and outcome
 

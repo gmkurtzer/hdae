@@ -21,6 +21,9 @@ it does not duplicate the gate list or lifecycle state.
    boundaries for each execution batch.
 5. Continue automatically through passed gates only when the batch's confirmed
    checkpoint map delegates that authority.
+6. Record a human-confirmed current-branch or dedicated-PR-branch decision in
+   every gate before implementation, and split large gates into coherent,
+   independently reviewable commits.
 
 ## Scope changes
 

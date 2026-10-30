@@ -4,10 +4,11 @@
 - Skill path: `.agents/skills/hdae-development/SKILL.md`
 - Reload after context shift: required
 - Active gate: `hdae/gates-todo/7-external-update-installer.md`
-- Current state: technically passed; checkpoint review pending
-- Last evidence: Gate 7 passed skill validation, copy synchronization,
-  curl-to-shell update, legacy migration, user-file preservation, deprecation,
-  link, uninstall, full integration, completeness, and diff checks
-- Open decisions or limitations: none
-- Exact next action: human review of Gate 7; acceptance moves it to
-  `gates-done/`, while rejection or correction keeps it open
+- Current state: Gates 7–9 approved on current `main`; refinements in progress
+- Last evidence: the original Gate 7 implementation passed all checks before
+  universal discovery-link, skill-reload, delivery-strategy, and update-check
+  refinements were added
+- Open decisions or limitations: none; supported agents currently mean Codex
+  and Claude Code
+- Exact next action: finish Gates 7–9, synchronize installed skills, run fresh
+  evidence, commit coherent changes, and stop for human checkpoint review
