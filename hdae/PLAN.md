@@ -25,6 +25,12 @@ it does not duplicate the gate list or lifecycle state.
    every gate before implementation, and split large gates into coherent,
    independently reviewable commits.
 
+## Current delivery direction
+
+Use the current `main` branch for new gates until the human changes this
+direction. Continue recording that choice in each gate; do not infer permission
+to push.
+
 ## Scope changes
 
 Material changes belong in the affected gate and require human approval before

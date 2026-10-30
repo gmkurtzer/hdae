@@ -50,6 +50,8 @@ implemented.
 ## Decisions and limitations
 
 - The human selected the existing `main` branch and no PR for Gates 7–9.
+- The human subsequently selected current `main` for all new work until that
+  direction changes; `hdae/PLAN.md` records the standing project choice.
 - “Large” is based on independently reviewable changes, components, migrations,
   or risks rather than a line-count threshold.
 

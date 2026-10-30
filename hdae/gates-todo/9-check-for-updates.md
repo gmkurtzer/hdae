@@ -25,11 +25,11 @@ Let an agent determine whether an installed HDAE copy differs from GitHub
 - [x] Confirmed a natural-language, read-only update check with the human.
 - [x] Added the update-check workflow to the HDAE skill.
 - [x] Validated and synchronized the installed skill copy.
+- [x] Ran the workflow against GitHub `main` after the human pushed.
 
 ## Remaining work
 
-- [ ] After the human pushes, run the workflow against GitHub `main` and obtain
-  checkpoint review.
+- [ ] Obtain human checkpoint review.
 
 ## Acceptance criteria
 
@@ -49,8 +49,8 @@ Let an agent determine whether an installed HDAE copy differs from GitHub
   `diff` status `1` and named the changed skill and method paths.
 - `git status --porcelain` was identical before and after the fixture, proving
   the project was not changed.
-- Live GitHub `main` verification is intentionally pending until the human
-  pushes these commits.
+- After the push, the live check cloned GitHub `main` at `b2771f7`, returned
+  `diff` status `0`, and left `git status --porcelain` unchanged.
 
 ## Decisions and limitations
 
@@ -71,5 +71,5 @@ Let an agent determine whether an installed HDAE copy differs from GitHub
 ## Review policy and outcome
 
 Checkpoint review with Gates 7 and 8 before the human pushes and performs the
-live upstream check. Local technical behavior passed; the live remote criterion
+live upstream check. Local and live technical behavior passed; human review
 remains pending.

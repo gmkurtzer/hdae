@@ -9,6 +9,18 @@ This repository packages that method as portable Agent Skills for Codex and
 Claude Code. The skills are project-agnostic and can be installed into new or
 existing repositories.
 
+## Origin
+
+This project grew out of Gregory M. Kurtzer's work on
+[Ginux](https://github.com/gmkurtzer/ginux). The human-directed process he used
+there - persistent architecture and constraints, executable acceptance gates,
+and agent-executed implementation and diagnosis loops - inspired this
+repository's formalization of HDAE.
+
+For the detailed case study and method, see Gregory M. Kurtzer's report,
+[*Ginux: Building an Independent Kernel That Runs Linux Userspace through
+Human-Directed Agentic Engineering*](https://zenodo.org/records/23682548).
+
 ## Included skills
 
 - **`hdae-development`** interviews the human, records the shared project

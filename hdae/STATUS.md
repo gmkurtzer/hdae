@@ -3,15 +3,12 @@
 - Active skill: `hdae-development`
 - Skill path: `.agents/skills/hdae-development/SKILL.md`
 - Reload after context shift: required
-- Active gate: `hdae/gates-todo/9-check-for-updates.md`
-- Current state: Gates 7 and 8 technically passed; Gate 9 passed local fixtures
-  and awaits its live GitHub `main` check after the human pushes
-- Last evidence: universal-link integration tests, frontmatter validation,
-  canonical/installed comparison, full `make check`, and equal/different local
-  upstream fixtures passed without changing the project
-- Open decisions or limitations: the live update check cannot observe these
-  commits on GitHub until the human pushes; supported agents currently mean
-  Codex and Claude Code
-- Exact next action: human pushes the local commits and asks the agent to check
-  HDAE for updates; run the read-only live check, record evidence, then request
-  checkpoint acceptance for Gates 7–9
+- Active gate: `hdae/gates-todo/10-ginux-origin-readme.md`
+- Current state: Gates 7–10 technically passed and await checkpoint review
+- Last evidence: Gate 9 matched live GitHub `main` at `b2771f7` without project
+  mutation; Gate 10's source metadata, links, README text, `make check`, and
+  `git diff --check` all passed
+- Open decisions or limitations: the human must review the author-facing README
+  wording; use current `main` for new work until directed otherwise
+- Exact next action: commit the README and gate evidence with sign-off, then
+  request checkpoint acceptance for Gates 7–10
