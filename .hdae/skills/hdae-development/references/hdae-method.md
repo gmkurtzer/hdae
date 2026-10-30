@@ -333,6 +333,37 @@ why, use the most objective repeatable evidence available, and identify any
 human judgment or external dependency. Human acceptance evaluates direction
 and subjective quality; it does not replace reasonable automated checks.
 
+## Defects discovered during gate execution
+
+Finding an out-of-scope defect is useful evidence, not permission to fix it and
+not a reason to leave the human with an undefined scope decision. First record
+the reproduction, observed result, expected result, impact, and relationship to
+the active gate. If the defect blocks a criterion, mark that criterion and the
+gate partial or blocked precisely; do not report the active gate as passed.
+
+When the defect blocks acceptance, requires more than a small bounded loop, or
+needs its own durable regression evidence, propose a new corrective gate by
+default. The proposal must include:
+
+- a concrete name and numeric placement based on its dependency relationship;
+- the observable fix and why it is separate from the active gate;
+- approved scope, non-goals, and affected architecture or compatibility
+  boundaries;
+- a deterministic reproduction and criterion-by-criterion verification plan;
+- regression checks for both the defect and the interrupted gate;
+- the active gate's blocked, deferred, or resume-after relationship;
+- branch, pull-request, and commit strategy; and
+- checkpoint or delegated review policy.
+
+Present that draft with a direct offer to create and execute the gate. Existing
+gate or batch approval does not authorize it. If the human approves, persist the
+new gate, finish any unresolved alignment, and begin work without requiring the
+human to restate the diagnosis. If the human instead chooses to expand the
+existing open gate, update its scope, criteria, plan, and review policy before
+implementation. Never expand or otherwise modify a gate in `gates-done/`; a
+closed gate always requires a new follow-up gate unless the human explicitly
+reopens it under the locked-gate procedure.
+
 ## Delivery strategy and commit structure
 
 Every newly created gate records how its work will be delivered. Ask the human

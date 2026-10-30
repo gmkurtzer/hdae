@@ -115,6 +115,25 @@ Report the attempts, evidence, alternatives, and recommendation, and persist the
 checkpoint. Difficulty alone is not a blocker; exhaust sensible bounded
 alternatives first.
 
+## Turn discovered defects into proposed gates
+
+When execution exposes a credible defect outside the approved gate, do not
+silently fix it or stop at a vague scope question. Preserve the reproduction,
+impact, and blocking relationship in the active checkpoint, then draft the
+smallest corrective gate when the defect blocks acceptance, needs multiple
+loops, or requires durable verification. Show its proposed position and
+dependencies, goal, scope and non-goals, deterministic acceptance evidence,
+delivery strategy, and review policy. Recommend whether the active gate should
+remain blocked, be deferred, or resume after the corrective gate.
+
+Prefer a new gate so the original approval and evidence remain intact. Expand
+an existing open gate only when the human explicitly chooses that option after
+seeing the scope and verification changes; never modify a closed gate. Ask the
+human whether to create and execute the proposed corrective gate. Prior approval
+of the active gate or batch does not authorize the new work. After approval,
+create the gate, complete any remaining alignment, and execute it through the
+normal HDAE loop instead of waiting for the human to restate the bug.
+
 ## Recover context before continuing
 
 At task start and after any compaction, context reset, resume, or handoff,
