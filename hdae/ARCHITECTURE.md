@@ -37,6 +37,9 @@ must not duplicate those facts in identifiers, ordering fields, or gate indexes.
 - Automatic completion authority applies only to the confirmed batch.
 - Deferral records a reason and a condition for reconsideration.
 - Decimal positions are unique and unnecessary trailing zeros are forbidden.
+- Every acceptance criterion has deterministic planned verification where
+  practical; exceptions record why and use the most objective repeatable
+  evidence available.
 - Every acceptance criterion has fresh evidence before technical passage.
 - Blockers, failed dependencies, scope changes, and consequential decisions stop
   automatic advancement unless the confirmed policy explicitly covers them.

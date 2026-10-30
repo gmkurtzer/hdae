@@ -112,10 +112,11 @@ intentionally postponed gates. The leading decimal filename component is
 execution position. Do not duplicate path-derived lifecycle or order in gate
 indexes or metadata fields.
 
-Keep completed work, remaining work, criteria, evidence, decisions, limitations,
-and review policy in that gate file. A technically passed gate remains in
-`gates-todo/` until it reaches its confirmed review boundary: explicit human
-acceptance for a checkpoint gate or automatic closure for a delegated gate.
+Keep completed work, remaining work, criteria, verification plan, evidence,
+decisions, limitations, and review policy in that gate file. A technically
+passed gate remains in `gates-todo/` until it reaches its confirmed review
+boundary: explicit human acceptance for a checkpoint gate or automatic closure
+for a delegated gate.
 Move a gate to `gates-deferred/` only with the reason and return condition
 recorded; move it back to `gates-todo/` when reactivated. Read the gate-ledger
 procedure and shell commands in
@@ -237,9 +238,9 @@ batch, its acceptance criteria, and its checkpoint map.
    plan.
 4. Present a proposed gate map in plain, concrete language. For every gate show
    its goal, observable outcome, included and excluded work, dependencies,
-   deliverables, acceptance evidence, and proposed review policy. For
-   substantial work, also show the ordered plan and task list that implement the
-   gates.
+   deliverables, acceptance evidence, verification plan, and proposed review
+   policy. For substantial work, also show the ordered plan and task list that
+   implement the gates.
 5. Perform a coverage review across functionality, failure behavior,
    regression testing, user workflow, documentation, compatibility or
    migration, and operational or security concerns when relevant. Mark a
@@ -248,6 +249,15 @@ batch, its acceptance criteria, and its checkpoint map.
    gates may run, and where should I stop for review?”
 7. Wait for approval. Do not treat silence, general enthusiasm, or approval of
    the overall idea as approval of a gate batch or checkpoint map.
+
+When creating or revising a gate, maximize deterministic verification. Map
+every acceptance criterion to an automated test, command, or reproducible
+procedure and state its expected result in the gate's `Verification plan`.
+Prefer controlled inputs, stable fixtures, machine-checkable outputs, and
+explicit exit status or state assertions. If deterministic verification is not
+practical, record why, name the most objective repeatable evidence available,
+and state whether human judgment or an external dependency is required. Human
+review must not replace a check that can reasonably be automated.
 
 When the human adds or changes a requirement, update the affected gate map and
 acceptance criteria. If the change is material, obtain approval before
@@ -304,8 +314,9 @@ durable handoff.
 4. Establish a reproducible baseline. Use a branch, tag, or checkpoint when it
    materially improves comparison or recovery and the human authorizes it.
 5. Divide the work into reviewable milestones. Each gate must name deliverables,
-   positive and negative acceptance criteria, regression checks, evidence, and
-   a stopping point.
+   positive and negative acceptance criteria, regression checks, a
+   criterion-by-criterion verification plan with expected results, evidence,
+   and a stopping point.
 6. Complete the mandatory gate-alignment conversation. Planning alone does not
    authorize implementation.
 
