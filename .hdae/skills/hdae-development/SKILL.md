@@ -102,6 +102,23 @@ reload is required after a context shift. Read the recovery procedure in
 [references/hdae-method.md](references/hdae-method.md) when establishing or
 resuming durable project work.
 
+## Maintain the filesystem gate ledger
+
+Every approved gate must have one authoritative Markdown file under the
+project's root `hdae/` directory. The directory is lifecycle state:
+`gates-todo/` contains all work not yet accepted, `gates-done/` contains only
+human-accepted gates, and `gates-deferred/` contains intentionally postponed
+gates. The leading decimal filename component is execution position. Do not
+duplicate path-derived lifecycle or order in gate indexes or metadata fields.
+
+Keep completed work, remaining work, criteria, evidence, decisions, limitations,
+and human review in that gate file. A technically passed gate remains in
+`gates-todo/` until the human accepts it. Move a gate to `gates-deferred/` only
+with the reason and return condition recorded; move it back to `gates-todo/`
+when reactivated. Read the gate-ledger procedure and shell commands in
+[references/hdae-method.md](references/hdae-method.md) before creating,
+inserting, selecting, deferring, completing, or migrating gates.
+
 ## Mandatory gate alignment
 
 Before implementation, align the gates with the human. Skip this only when the
@@ -147,11 +164,11 @@ write or update durable repository files covering:
   required human decisions, exact next action, active skill and discovery path,
   and whether skill reload is required after a context shift.
 
-Use existing project conventions when possible. For a small project, one
-`docs/HDAE.md` may be sufficient. For a substantial project without an existing
-structure, propose `docs/hdae/PROJECT.md`, `ARCHITECTURE.md`, `PLAN.md`, and
-`STATUS.md`. Create only the files the project needs and link them rather than
-duplicating content.
+Use existing authoritative product and architecture documents when possible,
+but keep the HDAE control plane under root `hdae/`: `PROJECT.md`,
+`ARCHITECTURE.md`, `PLAN.md`, `STATUS.md`, and the three gate lifecycle
+directories. Keep one source of truth for each fact and link existing project
+documents rather than copying them.
 
 For substantial or long-running work, read
 [references/hdae-method.md](references/hdae-method.md) and use its scalable
@@ -193,7 +210,8 @@ assessing the project process.
 ## Implement an approved gate
 
 1. Restate the human-approved active gate, scope, invariants, and acceptance
-   commands. If any of those are missing, return to gate alignment.
+   commands, and create or locate its `gates-todo/` record. If any are missing,
+   return to gate alignment.
 2. Reproduce the current behavior or missing capability when practical.
 3. Implement the narrowest coherent change that can satisfy the gate.
 4. Iterate autonomously within that boundary under the convergence rules:
@@ -209,7 +227,8 @@ assessing the project process.
    the gate complete because its main code path works.
 9. Reconcile source, generated, vendored, and installed copies when relevant;
    inspect documentation, repository state, commits, and temporary artifacts.
-10. Update the persisted gate status, evidence, open questions, and next action.
+10. Update the gate file's completed work, remaining work, evidence, decisions,
+    limitations, human-review state, and exact next action, plus `STATUS.md`.
 11. Present a completion summary naming delivered work, evidence, coverage,
     repository state, remaining work, and the exact human decision required.
     Stop at the gate boundary and let the human accept, reject, redirect, or
@@ -226,6 +245,10 @@ Verify observable behavior from a clean and relevant state. A gate is
 **failed**, **blocked**, **not run**, or **partial** precisely.
 **Accepted** is separate: it means the human reviewed and accepted a passed
 gate. Never imply that technical passage is human acceptance.
+
+A gate cannot pass until its authoritative file records every criterion and the
+fresh evidence that satisfied it. Technical passage leaves the file in
+`gates-todo/`; only explicit human acceptance moves it to `gates-done/`.
 
 For maintenance, connect each issue or request to the authoritative product and
 architecture documents. Add the smallest gate that reproduces the problem,

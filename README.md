@@ -177,6 +177,13 @@ the project, interview the human until the outcome and constraints are clear,
 persist the shared understanding, propose complete gates, and ask which gate is
 approved. Implementation stops at every gate boundary for human evaluation.
 
+HDAE project-control state lives under root `hdae/`, separate from the installed
+tooling in `.hdae/`. Gate files live in `hdae/gates-todo/`,
+`hdae/gates-done/`, or `hdae/gates-deferred/`; their leading decimal filename
+component defines execution order. The skill uses portable shell commands to
+discover the next gate and insert work without generated indexes or renumbering
+unrelated gates.
+
 ### Configure recurring PR and issue review
 
 Codex:

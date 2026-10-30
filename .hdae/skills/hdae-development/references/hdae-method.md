@@ -57,6 +57,112 @@ the project needs them, but do not create documents for ceremony:
 
 Link to authoritative material rather than duplicating it.
 
+## Filesystem gate ledger
+
+Every approved gate has exactly one Markdown file. Use this root structure:
+
+```text
+hdae/
+|-- PROJECT.md
+|-- ARCHITECTURE.md
+|-- PLAN.md
+|-- STATUS.md
+|-- gates-todo/
+|-- gates-done/
+`-- gates-deferred/
+```
+
+The path is authoritative metadata:
+
+- `gates-todo/` means the gate is actionable, blocked, failed, or technically
+  passed but still awaiting human acceptance;
+- `gates-done/` means the human accepted the gate; and
+- `gates-deferred/` means the human intentionally postponed it and the file
+  records why and what should cause reconsideration.
+
+The filename is `<decimal-position>-<short-slug>.md`. Use integers for ordinary
+appends and a decimal midpoint for insertion. For example, insert `1.5-auth.md`
+between `1-foundation.md` and `2-api.md`; further insertions may use `1.25` or
+`1.75`. Use only digits and one decimal point, remove unnecessary trailing
+zeros, and never reuse a position. Do not add `id`, lifecycle, or order fields
+that repeat the path. If an existing gate must be reordered, rename only that
+gate.
+
+Run these commands from the repository root. List every gate in execution order:
+
+```sh
+find hdae/gates-* -type f -name '*.md' -print |
+    LC_ALL=C sort -t/ -k3,3n
+```
+
+Find the earliest gate that is not yet accepted or deferred:
+
+```sh
+find hdae/gates-todo -type f -name '*.md' -print |
+    LC_ALL=C sort -t/ -k3,3n |
+    sed -n '1p'
+```
+
+When appending a gate, derive the next integer from all lifecycle directories,
+not only `gates-todo/`. This still works when todo is empty:
+
+```sh
+last=$(find hdae/gates-* -type f -name '*.md' -print |
+    LC_ALL=C sort -t/ -k3,3n | tail -n 1)
+if [ -z "$last" ]; then
+    next=1
+else
+    sequence=${last##*/}
+    sequence=${sequence%%-*}
+    next=$(awk -v n="$sequence" 'BEGIN { print int(n) + 1 }')
+fi
+printf '%s\n' "$next"
+```
+
+For insertion, calculate a decimal strictly between the neighboring prefixes
+and confirm no gate already uses it before creating the file. The gate stays in
+`gates-todo/` after technical passage. Move it to `gates-done/` only after
+explicit human acceptance. Move it to `gates-deferred/` only after explicit
+deferral, retaining the same filename, and return it to `gates-todo/` when the
+recorded condition is met.
+
+The gate body owns substantive information, not routing metadata:
+
+```markdown
+# <Gate name>
+
+## Goal
+<Observable outcome.>
+
+## Approved scope
+- <Authorized work.>
+
+## Non-goals
+- <Excluded work.>
+
+## Completed work
+- [x] <Finished task.>
+
+## Remaining work
+- [ ] <Unfinished task or human acceptance.>
+
+## Acceptance criteria
+- <Positive, negative, and regression behavior.>
+
+## Evidence
+- `<command or procedure>` -> <observed result.>
+
+## Decisions and limitations
+- <Material decision, failure, limitation, or deferral condition.>
+
+## Human review
+<Approval, correction, technical passage awaiting acceptance, or deferral.>
+```
+
+Do not create generated todo/done indexes. The lifecycle directories and
+numeric shell sort are the ledger. `PLAN.md` contains only project-wide strategy
+and conventions; `STATUS.md` contains only the resumable active checkpoint.
+
 ## Scale planning to the work
 
 Every task needs a plan discussion before execution, but not every task needs a
@@ -105,15 +211,16 @@ At planning and completion boundaries, perform four checks:
 Chat context is temporary. The repository must contain enough authoritative
 state for a new agent or later session to resume safely.
 
-Prefer existing product, architecture, planning, decision, and status files. If
-none exist, use one compact `docs/HDAE.md` for small work or propose a split
-under `docs/hdae/` for substantial work:
+Prefer existing product and architecture sources, linking rather than copying
+them. Keep HDAE's own control files under root `hdae/`:
 
 - `PROJECT.md`: intent, users, outcomes, scope, and non-goals;
 - `ARCHITECTURE.md`: boundaries, invariants, constraints, and decisions;
-- `PLAN.md`: milestone and gate ledger with acceptance criteria;
+- `PLAN.md`: project-wide strategy, dependencies, and planning conventions;
 - `STATUS.md`: current gate, last verified evidence, limitations, open
   questions, required decisions, and next action.
+- the lifecycle gate directories: completed work, remaining work, criteria,
+  evidence, decisions, limitations, and human review for each gate.
 
 Keep one source of truth for each fact. Link evidence and decision records rather
 than copying them into every file.
@@ -208,46 +315,6 @@ check, not permission to expand the user's goal.
 At gate completion, repeat the coverage review against the approved scope and
 show evidence for every acceptance criterion. Missing or unverified work keeps
 the gate partial.
-
-## Gate template
-
-```markdown
-## Gate: <observable outcome>
-
-Status: proposed | approved | in progress | passed | failed | blocked
-
-### Goal
-<Plain-language user or project outcome this gate advances.>
-
-### Purpose
-<User, product, architectural, or risk reason.>
-
-### Scope
-- <Authorized work>
-
-### Dependencies
-- <Required prior gate, input, or decision>
-
-### Non-goals
-- <Deferred or prohibited work>
-
-### Deliverables
-- <Code, tests, documentation, or behavior>
-
-### Acceptance criteria
-- <Positive behavior>
-- <Negative or failure behavior>
-- <Regression behavior>
-
-### Evidence
-- `<command or procedure>` -> <required observation>
-
-### Task list
-- [ ] <Task mapped to an acceptance criterion; include for substantial work>
-
-### Stop
-Stop for human review before beginning <dependent work>.
-```
 
 ## Closed-loop execution
 
