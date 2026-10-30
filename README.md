@@ -43,8 +43,7 @@ curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | sh
 Or give your coding agent this instruction:
 
 ```text
-From the project root, run:
-curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | sh
+Install (or update) HDAE skills from here: https://github.com/gmkurtzer/hdae
 ```
 
 This installs every included HDAE skill for every supported agent. It requires
