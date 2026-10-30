@@ -26,9 +26,9 @@ Human-Directed Agentic Engineering*](https://zenodo.org/records/23682548).
 - **`hdae-development`** interviews the human, records the shared project
   context, proposes executable gates, implements only an approved gate, and
   stops at each boundary with evidence.
-- **`pr-issue-review`** discovers repository access, asks for a review cadence,
-  previews a read-only review, and helps configure recurring issue and pull
-  request monitoring.
+- **`pr-issue-review`** monitors issues and pull requests, repeats outstanding
+  maintainer attention until acknowledgment, and acts only within an explicit
+  authorization policy.
 
 The skill directories under [`skills/`](skills/) are the canonical source.
 
