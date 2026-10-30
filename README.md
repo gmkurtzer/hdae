@@ -32,129 +32,42 @@ Human-Directed Agentic Engineering*](https://zenodo.org/records/23682548).
 
 The skill directories under [`skills/`](skills/) are the canonical source.
 
-## Requirements
+## Install
 
-Installation uses a POSIX shell and these common tools:
-
-- `git`
-- `curl` for the recommended installation command
-- `cp`, `find`, `sort`, and `tar`
-- `sha256sum`, `shasum`, or `openssl` for SHA-256 checksums
-
-Python is not required.
-
-## Install into another project
-
-### Recommended: install the latest version
-
-From the root of the project that should use HDAE:
+From the root of your project, run:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | sh
 ```
 
-The downloaded installer fetches HDAE from `main`, installs both skills into
-the current project, and configures discovery for every supported agent. To
-select another target, pass installer arguments through `sh -s --`, for
-example:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
-    sh -s -- --copy --target /path/to/project
-```
-
-You can also ask a coding agent to perform the installation from the project
-that should use HDAE:
+Or give your coding agent this instruction:
 
 ```text
-Install the HDAE skills into this project from https://github.com/gmkurtzer/hdae
+From the project root, run:
+curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | sh
 ```
 
-The installer copies the canonical skills into `.hdae/skills/`, records their
-source and checksum in `.hdae/manifest`, and creates Git-compatible relative
-discovery links. For each skill, it creates links at:
+This installs every included HDAE skill for every supported agent. It requires
+Git, `curl`, a POSIX shell, and a SHA-256 tool; Python is not required. Running
+the same command later updates the installed skills from `main`.
 
-- `.agents/skills/<skill>` for Codex
-- `.claude/skills/<skill>` for Claude Code
+## What to expect
 
-It does not copy itself into the target project.
+The installer:
 
-For Codex copy installations, the installer also appends a short,
-installer-managed recovery block to the project's `AGENTS.md`. It tells Codex
-to reload the complete HDAE skill and durable project checkpoint after context
-compaction, reset, resume, or handoff. Existing instructions remain in place;
-ambiguous, duplicate, or locally modified managed markers stop the installer
-instead of being overwritten. Uninstall removes only a block owned by HDAE.
+- copies the skills into `.hdae/skills/` and records their source and checksums
+  in `.hdae/manifest`;
+- creates discovery links for each skill at `.agents/skills/<skill>` for Codex
+  and `.claude/skills/<skill>` for Claude Code;
+- adds a small managed instruction to `AGENTS.md` so Codex reloads HDAE and the
+  project checkpoint after context compaction or handoff;
+- preserves local changes instead of silently overwriting modified managed
+  files; and
+- never installs a copy of the installer into the project or runs project code.
 
 Commit `.hdae/`, `.agents/skills/`, `.claude/skills/`, and the managed
 `AGENTS.md` block with the project so every contributor and CI checkout receives
 the same skill version and recovery behavior.
-
-### Reproducible pinned installation
-
-To inspect and pin the exact release before running it:
-
-```sh
-git clone --depth 1 --branch v0.1.1 https://github.com/gmkurtzer/hdae.git .hdae-source
-./.hdae-source/install.sh --all --copy
-rm -rf .hdae-source
-```
-
-The curl command tracks `main`; use this pinned workflow when reproducibility
-or source review is more important than automatically selecting the latest
-version.
-
-### Interactive installation
-
-Clone HDAE anywhere, enter the target project, and run its installer:
-
-```sh
-git clone https://github.com/gmkurtzer/hdae.git /tmp/hdae
-cd /path/to/project
-/tmp/hdae/install.sh
-```
-
-The installer configures Codex and Claude Code to use the same canonical skill
-copies. It does not overwrite an existing installation unless its recorded
-checksum still matches or `--force` is explicitly supplied.
-
-### Copy without the installer
-
-A skill is a complete directory. To install one skill manually for Codex:
-
-```sh
-mkdir -p .agents/skills
-cp -R /path/to/hdae/skills/hdae-development .agents/skills/
-```
-
-For Claude Code:
-
-```sh
-mkdir -p .claude/skills
-cp -R /path/to/hdae/skills/hdae-development .claude/skills/
-```
-
-Copy the complete directory, including `SKILL.md`, `agents/`, and
-`references/`. Repeat with `pr-issue-review` if that workflow is wanted.
-
-## Installer commands
-
-```text
-./install.sh                         Copy-install for every supported agent
-./install.sh --all --copy            Install for Codex and Claude Code
-./install.sh --codex --copy          Compatibility alias for --all
-./install.sh --claude --copy         Compatibility alias for --all
-./install.sh --target /path/project  Select the target repository
-./install.sh --uninstall             Remove an installer-managed copy
-```
-
-Local changes are detected using the recorded skill checksum and block
-replacement unless `--force` is supplied. Checksums include regular-file
-content and symlink targets and are portable across the supported SHA-256
-tools. The managed `AGENTS.md` recovery block is installed for Codex; users who
-copy skills manually should add an equivalent repository instruction when
-compaction recovery is required. The installer never runs project code and
-never installs itself into a managed copy.
 
 ## Use HDAE
 
@@ -174,24 +87,22 @@ Claude Code:
 /hdae-development Help me develop this project.
 ```
 
-The initial request can be that simple. The skill directs the agent to inspect
-the project, interview the human until the outcome and constraints are clear,
-persist the shared understanding, propose complete gates, and ask which gate is
-approved. The human confirms which gate boundaries need review and which may
-advance automatically inside an approved batch.
+The initial request can be that simple. HDAE then helps the agent:
 
-HDAE project-control state lives under root `hdae/`, separate from the installed
-tooling in `.hdae/`. Gate files live in `hdae/gates-todo/`,
-`hdae/gates-done/`, or `hdae/gates-deferred/`; their leading decimal filename
-component defines execution order. The skill uses portable shell commands to
-discover the next gate and insert work without generated indexes or renumbering
-unrelated gates.
+- inspect the project and ask questions instead of guessing;
+- agree on the outcome, constraints, plan, and evidence before substantial
+  work begins;
+- use lightweight handling for small tasks and durable gates only when work is
+  large enough to need them;
+- iterate autonomously within the approved scope while testing its work;
+- persist long-running plans and checkpoints under `hdae/` so work survives
+  context compaction and handoff; and
+- stop for human direction at agreed checkpoints, ambiguity, blockers, or
+  consequential decisions.
 
-For multi-gate work, the agent first proposes the ordered batch and identifies
-which gates need human checkpoints. After the user confirms that map, passed
-non-checkpoint gates can close and advance automatically; checkpoint gates,
-blockers, failed dependencies, and new consequential decisions still stop for
-direction.
+For a larger effort, the human reviews the proposed gates and decides which
+need checkpoints. The agent may complete approved, objective gates in sequence,
+but it cannot silently broaden the plan or declare success without evidence.
 
 ### Configure recurring PR and issue review
 
@@ -211,30 +122,6 @@ The skill discovers the repository and available authentication, asks how often
 the review should run, conducts a read-only preview, and uses the agent's native
 scheduler when one is available. Repository mutations require separate explicit
 authorization.
-
-## Updating
-
-From an installed project:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
-    sh -s -- --target . --all --copy
-```
-
-Or ask a coding agent from the installed project:
-
-```text
-Update the HDAE skills in this project from https://github.com/gmkurtzer/hdae
-```
-
-Use `--codex` or `--claude` instead of `--all` when only one discovery target
-was configured by an older HDAE version; these compatibility aliases now repair
-and configure both supported discovery roots. The HDAE development skill knows
-this procedure and can perform it when directed. Review skill changes like any
-other dependency update before committing them. The installer is fetched for
-each update and is not stored in the target project. An installer run directly
-from a separately checked-out HDAE repository performs the same copy-based
-installation.
 
 ## Project status
 
