@@ -42,13 +42,13 @@ curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | sh
 ```
 
 The downloaded installer fetches HDAE from `main`, installs both skills into
-the current project, and configures discovery for Codex and Claude Code. To
-select only one agent or another target, pass installer arguments through
-`sh -s --`, for example:
+the current project, and configures discovery for every supported agent. To
+select another target, pass installer arguments through `sh -s --`, for
+example:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
-    sh -s -- --codex --copy --target /path/to/project
+    sh -s -- --copy --target /path/to/project
 ```
 
 The installer copies the canonical skills into `.hdae/skills/`, records their
@@ -95,9 +95,9 @@ cd /path/to/project
 /tmp/hdae/install.sh
 ```
 
-The installer asks whether to configure Codex, Claude Code, or both. It does
-not overwrite an existing installation unless its recorded checksum still
-matches or `--force` is explicitly supplied.
+The installer configures Codex and Claude Code to use the same canonical skill
+copies. It does not overwrite an existing installation unless its recorded
+checksum still matches or `--force` is explicitly supplied.
 
 ### Development link
 
@@ -134,10 +134,10 @@ Copy the complete directory, including `SKILL.md`, `agents/`, and
 ## Installer commands
 
 ```text
-./install.sh                         Interactive copy installation
+./install.sh                         Copy-install for every supported agent
 ./install.sh --all --copy            Install for Codex and Claude Code
-./install.sh --codex --copy          Install for Codex only
-./install.sh --claude --copy         Install for Claude Code only
+./install.sh --codex --copy          Compatibility alias for --all
+./install.sh --claude --copy         Compatibility alias for --all
 ./install.sh --all --link            Link to this HDAE checkout
 ./install.sh --target /path/project  Select the target repository
 ./install.sh --uninstall             Remove an installer-managed copy
@@ -217,11 +217,12 @@ curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
 ```
 
 Use `--codex` or `--claude` instead of `--all` when only one discovery target
-is configured. The HDAE development skill knows this procedure and can perform
-it when directed. Review skill changes like any other dependency update before
-committing them. The installer is fetched for each update and is not stored in
-the target project. For a development checkout cloned directly into `.hdae`,
-update that checkout with Git and rerun its source
+was configured by an older HDAE version; these compatibility aliases now repair
+and configure both supported discovery roots. The HDAE development skill knows
+this procedure and can perform it when directed. Review skill changes like any
+other dependency update before committing them. The installer is fetched for
+each update and is not stored in the target project. For a development checkout
+cloned directly into `.hdae`, update that checkout with Git and rerun its source
 `./.hdae/install.sh --all --link`.
 
 ## Project status

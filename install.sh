@@ -12,8 +12,8 @@ case "$PROGRAM" in
 esac
 REPOSITORY_URL=${HDAE_REPOSITORY_URL:-https://github.com/gmkurtzer/hdae.git}
 TARGET=
-INSTALL_CODEX=0
-INSTALL_CLAUDE=0
+INSTALL_CODEX=1
+INSTALL_CLAUDE=1
 MODE=copy
 UNINSTALL=0
 FORCE=0
@@ -28,9 +28,9 @@ Usage: $PROGRAM [OPTIONS]
 
 Install HDAE Agent Skills into a project.
 
-  --all               Install discovery links for Codex and Claude Code
-  --codex             Install discovery links for Codex
-  --claude            Install discovery links for Claude Code
+  --all               Install discovery links for every supported agent
+  --codex             Compatibility alias for --all
+  --claude            Compatibility alias for --all
   --copy              Copy skills into the target project (default)
   --link              Link agents directly to this HDAE checkout
   --target DIRECTORY  Select the target project (default: Git root or cwd)
@@ -181,8 +181,8 @@ install_agents_bootstrap() {
 for argument in "$@"; do
     case "$argument" in
         --all) INSTALL_CODEX=1; INSTALL_CLAUDE=1 ;;
-        --codex) INSTALL_CODEX=1 ;;
-        --claude) INSTALL_CLAUDE=1 ;;
+        --codex) INSTALL_CODEX=1; INSTALL_CLAUDE=1 ;;
+        --claude) INSTALL_CODEX=1; INSTALL_CLAUDE=1 ;;
         --copy) MODE=copy ;;
         --link) MODE='link' ;;
         --update|--version)
@@ -253,22 +253,6 @@ if [ "$UNINSTALL" -eq 1 ]; then
     rmdir "$HDAE_DIR" 2>/dev/null || true
     printf 'Removed installer-managed HDAE skills from %s\n' "$TARGET"
     exit 0
-fi
-
-if [ "$INSTALL_CODEX" -eq 0 ] && [ "$INSTALL_CLAUDE" -eq 0 ]; then
-    if [ -t 0 ]; then
-        printf 'Install HDAE for:\n  1) Codex\n  2) Claude Code\n  3) Both\nSelection [3]: '
-        IFS= read -r selection
-        case ${selection:-3} in
-            1) INSTALL_CODEX=1 ;;
-            2) INSTALL_CLAUDE=1 ;;
-            3) INSTALL_CODEX=1; INSTALL_CLAUDE=1 ;;
-            *) die "invalid selection" ;;
-        esac
-    else
-        INSTALL_CODEX=1
-        INSTALL_CLAUDE=1
-    fi
 fi
 
 if [ "$STDIN_INSTALL" -eq 1 ]; then

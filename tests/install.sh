@@ -80,6 +80,8 @@ cp "$REPOSITORY_ROOT/AGENTS.md" "$UNOWNED_BOOTSTRAP_PROJECT/AGENTS.md"
 "$REPOSITORY_ROOT/install.sh" --target "$UNOWNED_BOOTSTRAP_PROJECT" \
     --codex --copy >"$TEST_ROOT/unowned-bootstrap.out"
 grep -q '^agents_bootstrap=0$' "$UNOWNED_BOOTSTRAP_PROJECT/.hdae/manifest"
+test -L "$UNOWNED_BOOTSTRAP_PROJECT/.agents/skills/hdae-development"
+test -L "$UNOWNED_BOOTSTRAP_PROJECT/.claude/skills/hdae-development"
 "$REPOSITORY_ROOT/install.sh" --target "$UNOWNED_BOOTSTRAP_PROJECT" \
     --uninstall >"$TEST_ROOT/unowned-bootstrap-uninstall.out"
 cmp -s "$REPOSITORY_ROOT/AGENTS.md" "$UNOWNED_BOOTSTRAP_PROJECT/AGENTS.md"
@@ -138,6 +140,22 @@ test "$(grep -Fxc '<!-- hdae:context-recovery:end -->' "$PROJECT/AGENTS.md")" -e
 # Reinstalling an unchanged managed copy must be idempotent.
 "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy
 test "$(grep -Fxc '<!-- hdae:context-recovery:start -->' "$PROJECT/AGENTS.md")" -eq 1
+
+# Every accepted selector configures all supported agents, and an update repairs
+# a missing managed discovery link without duplicating the canonical skills.
+SELECTOR_PROJECT=$TEST_ROOT/selector-project
+mkdir -p "$SELECTOR_PROJECT"
+git -C "$SELECTOR_PROJECT" init -q
+"$REPOSITORY_ROOT/install.sh" --target "$SELECTOR_PROJECT" --claude --copy \
+    >"$TEST_ROOT/selector-install.out"
+test -L "$SELECTOR_PROJECT/.agents/skills/hdae-development"
+test -L "$SELECTOR_PROJECT/.claude/skills/hdae-development"
+rm "$SELECTOR_PROJECT/.agents/skills/hdae-development"
+"$REPOSITORY_ROOT/install.sh" --target "$SELECTOR_PROJECT" --codex --copy \
+    >"$TEST_ROOT/selector-repair.out"
+test -L "$SELECTOR_PROJECT/.agents/skills/hdae-development"
+test -L "$SELECTOR_PROJECT/.claude/skills/hdae-development"
+test "$(find "$SELECTOR_PROJECT/.hdae/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')" -eq 2
 
 # An old manifest identifies the historical self-copy as installer-managed. A
 # new external reinstall removes it and records that future files are unowned.

@@ -5,6 +5,8 @@
 - `skills/` contains the canonical skill sources.
 - `.hdae/skills/` contains installer-managed copies.
 - `.agents/skills/` and `.claude/skills/` expose discovery links.
+- Every install or update ensures both supported discovery roots link to the
+  same canonical skill copies; selector flags are compatibility aliases only.
 - `install.sh` is the external canonical installer and is never copied into a
   managed project installation.
 
