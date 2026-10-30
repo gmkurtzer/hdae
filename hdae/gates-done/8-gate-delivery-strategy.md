@@ -26,7 +26,7 @@ implemented.
 
 ## Remaining work
 
-- [ ] Obtain human checkpoint review.
+None.
 
 ## Acceptance criteria
 
@@ -68,5 +68,5 @@ implemented.
 ## Review policy and outcome
 
 Checkpoint review with Gates 7 and 9 because this changes the HDAE process the
-human will inspect before pushing. Technical passage is recorded; human review
-remains pending.
+human will inspect before pushing. The human accepted Gates 7–10 after reviewing
+the completed work. The gate is closed.

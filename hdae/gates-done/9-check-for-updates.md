@@ -29,7 +29,7 @@ Let an agent determine whether an installed HDAE copy differs from GitHub
 
 ## Remaining work
 
-- [ ] Obtain human checkpoint review.
+None.
 
 ## Acceptance criteria
 
@@ -71,5 +71,5 @@ Let an agent determine whether an installed HDAE copy differs from GitHub
 ## Review policy and outcome
 
 Checkpoint review with Gates 7 and 8 before the human pushes and performs the
-live upstream check. Local and live technical behavior passed; human review
-remains pending.
+live upstream check. The human accepted Gates 7–10 after the live check. The
+gate is closed.

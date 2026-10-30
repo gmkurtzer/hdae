@@ -27,7 +27,7 @@ to build Ginux, with direct links to the project and technical report.
 
 ## Remaining work
 
-- [ ] Obtain human checkpoint review of the wording.
+None.
 
 ## Acceptance criteria
 
@@ -72,4 +72,5 @@ to build Ginux, with direct links to the project and technical report.
 ## Review policy and outcome
 
 Checkpoint review because the attribution and wording are author-facing and
-subjective. Technical passage is recorded; human review remains pending.
+subjective. The human accepted Gates 7–10 and the README wording. The gate is
+closed.

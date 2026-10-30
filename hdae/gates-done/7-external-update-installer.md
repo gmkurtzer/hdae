@@ -45,7 +45,7 @@ running the current `main` installer through a shell pipe.
 
 ## Remaining work
 
-- [ ] Obtain human checkpoint review.
+None.
 
 ## Acceptance criteria
 
@@ -106,5 +106,5 @@ running the current `main` installer through a shell pipe.
 ## Review policy and outcome
 
 Checkpoint required because this changes installer ownership and migration
-behavior. Implementation is approved and technical passage is recorded; human
-review remains pending.
+behavior. The human accepted Gates 7–10 after reviewing the completed work. The
+gate is closed.
