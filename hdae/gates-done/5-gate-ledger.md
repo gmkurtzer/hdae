@@ -38,7 +38,7 @@ repository without duplicate indexes or ordering metadata.
 
 ## Remaining work
 
-- [ ] Obtain human acceptance.
+None.
 
 ## Acceptance criteria
 
@@ -67,8 +67,13 @@ repository without duplicate indexes or ordering metadata.
 - `make check` and `git diff --check` passed.
 - Forward, reverse, coverage, and orphan review found no unmapped requirement,
   out-of-scope change, omitted relevant surface, or abandoned decision.
+- Fresh batch verification returned Gates 1–6 in numeric order, Gate 3 as the
+  earliest open gate, `7` as the next append, and `1` for an empty ledger.
+- A fresh temporary ledger sorted `1`, `1.5`, and `2` correctly; all six gate
+  positions were unique and the legacy ledger remained absent.
+- Fresh shared validators, comparisons, `make check`, `git diff --check`, and
+  signed commit-presence checks passed.
 
-## Human review
+## Review policy and outcome
 
-The human approved implementation of this gate. Technical passage is recorded;
-human acceptance remains pending.
+Closed under the confirmed Gates 3–6 batch delegation after fresh verification.

@@ -29,7 +29,7 @@ reset, resume, or handoff without requiring the human to notice the transition.
 
 ## Remaining work
 
-- [ ] Human acceptance.
+None.
 
 ## Acceptance evidence
 
@@ -38,7 +38,10 @@ reset, resume, or handoff without requiring the human to notice the transition.
 - `make check` and `git diff --check` passed.
 - The suite covered user-owned and installer-owned recovery blocks.
 - Implementation commit: `b055910 Recover HDAE after context compaction`.
+- Fresh batch verification passed both skill validators, canonical/installed
+  skill and installer comparisons, the full installer integration suite,
+  `git diff --check`, and commit-presence checks.
 
-## Human review
+## Review policy and outcome
 
-Technical passage is recorded. Human acceptance remains pending.
+Closed under the confirmed Gates 3–6 batch delegation after fresh verification.

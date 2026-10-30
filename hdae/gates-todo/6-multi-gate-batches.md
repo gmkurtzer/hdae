@@ -35,6 +35,7 @@ human pauses while preserving deliberate checkpoints for decisions and risk.
 - [x] Synchronized and validated installed artifacts.
 - [x] Ran behavioral, skill, and project checks.
 - [x] Prepared the work for a signed-off commit.
+- [x] Live-tested an all-todo batch with delegated Gates 3–5 and this checkpoint.
 
 ## Remaining work
 
@@ -57,8 +58,12 @@ human pauses while preserving deliberate checkpoints for decisions and risk.
 
 - Scenario review confirmed that “all todo gates” requires an ordered batch and
   checkpoint-map proposal before execution.
+- The live “all remaining todo gates” request produced an ordered Gates 3–6
+  batch and checkpoint map, and execution waited for human confirmation.
 - Scenario review confirmed that passed delegated gates close and advance,
   while passed checkpoint gates stop for review.
+- Fresh evidence closed Gates 3, 4, and 5 under delegation, moved them to
+  `gates-done/`, and advanced to this Gate 6 checkpoint without extra prompts.
 - Failure-path review confirmed that invalid dependencies, blockers, new scope,
   permissions, risks, and consequential effects stop automatic advancement.
 - Both canonical and installed skills passed `quick_validate.py`.
@@ -71,5 +76,6 @@ human pauses while preserving deliberate checkpoints for decisions and risk.
 
 ## Review policy and outcome
 
-Checkpoint required. The human approved implementation and technical passage is
-recorded; final review remains pending.
+Checkpoint confirmed for the Gates 3–6 batch. Implementation, technical
+passage, and the live batch test are recorded; final human review remains
+pending. The live test exposed no skill defect requiring another update.

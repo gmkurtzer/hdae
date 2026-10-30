@@ -33,7 +33,7 @@ without losing scope, work, decisions, or evidence.
 
 ## Remaining work
 
-- [ ] Human acceptance.
+None.
 
 ## Acceptance evidence
 
@@ -43,7 +43,9 @@ without losing scope, work, decisions, or evidence.
 - Forward, reverse, coverage, and orphan reviews found no unmapped requirement.
 - Implementation commits: `1f092e2 Refine HDAE planning and completion` and
   `904d0d7 Add HDAE convergence safeguards`.
+- Fresh batch verification passed both skill validators, canonical/installed
+  comparison, `make check`, `git diff --check`, and commit-presence checks.
 
-## Human review
+## Review policy and outcome
 
-Technical passage is recorded. Human acceptance remains pending.
+Closed under the confirmed Gates 3–6 batch delegation after fresh verification.
