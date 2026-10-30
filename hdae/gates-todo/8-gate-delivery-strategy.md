@@ -26,7 +26,7 @@ implemented.
 
 ## Remaining work
 
-- [ ] Record final commit identifiers and checkpoint evidence.
+- [ ] Obtain human checkpoint review.
 
 ## Acceptance criteria
 
@@ -60,9 +60,11 @@ implemented.
 - Pull request: not intended.
 - Planned commits: installer/link refinement; HDAE delivery and update-check
   workflows; final evidence and gate records.
-- Actual commits: pending.
+- Actual commits: `2dca8fa` refined installer links; `add9478` added the HDAE
+  workflows; final evidence is recorded by this gate file's containing commit.
 
 ## Review policy and outcome
 
 Checkpoint review with Gates 7 and 9 because this changes the HDAE process the
-human will inspect before pushing.
+human will inspect before pushing. Technical passage is recorded; human review
+remains pending.

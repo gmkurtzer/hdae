@@ -83,8 +83,9 @@ running the current `main` installer through a shell pipe.
   supported links, and reinstall repaired a deliberately removed managed link.
 - This turn reloaded the complete installed skill and required method reference
   immediately after synchronization.
-- Both canonical and installed skills passed `quick_validate.py` and matched
-  with `diff -qr`.
+- The bundled `quick_validate.py` could not start because PyYAML is unavailable;
+  dependency-free Ruby YAML parsing validated all canonical and installed skill
+  frontmatter, and the skill trees matched with `diff -qr`.
 - This repository migrated successfully: `.hdae/install.sh` is absent and its
   manifest records `installer_copy=0`.
 - `make check` and `git diff --check` passed after synchronization.
@@ -98,8 +99,9 @@ running the current `main` installer through a shell pipe.
 - Pull request: not intended.
 - Planned commits: external-installer ownership; universal discovery-link
   repair; HDAE reload and update-check guidance; final evidence and gate state.
-- Actual commits: `ae3010e` completed the external-installer ownership change;
-  remaining commits pending.
+- Actual commits: `ae3010e` externalized installer updates; `2dca8fa` added
+  universal supported-agent links; `add9478` added reload and update workflows;
+  final evidence is recorded by this gate file's containing commit.
 
 ## Review policy and outcome
 

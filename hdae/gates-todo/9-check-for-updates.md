@@ -28,7 +28,8 @@ Let an agent determine whether an installed HDAE copy differs from GitHub
 
 ## Remaining work
 
-- [ ] Run the local upstream-comparison fixture and record final evidence.
+- [ ] After the human pushes, run the workflow against GitHub `main` and obtain
+  checkpoint review.
 
 ## Acceptance criteria
 
@@ -43,7 +44,13 @@ Let an agent determine whether an installed HDAE copy differs from GitHub
 
 ## Evidence
 
-- Not run yet.
+- A local `main` clone compared equal to `.hdae/skills` with `diff` status `0`.
+- Checking out pre-refinement commit `ae3010e` in the temporary clone produced
+  `diff` status `1` and named the changed skill and method paths.
+- `git status --porcelain` was identical before and after the fixture, proving
+  the project was not changed.
+- Live GitHub `main` verification is intentionally pending until the human
+  pushes these commits.
 
 ## Decisions and limitations
 
@@ -58,9 +65,11 @@ Let an agent determine whether an installed HDAE copy differs from GitHub
 - Pull request: not intended.
 - Planned commits: HDAE delivery and update-check workflows; final evidence and
   gate records.
-- Actual commits: pending.
+- Actual commits: `add9478` added the workflow; final local evidence is recorded
+  by this gate file's containing commit.
 
 ## Review policy and outcome
 
 Checkpoint review with Gates 7 and 8 before the human pushes and performs the
-live upstream check.
+live upstream check. Local technical behavior passed; the live remote criterion
+remains pending.
