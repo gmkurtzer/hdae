@@ -10,5 +10,5 @@
   `git diff --check` all passed
 - Open decisions or limitations: the human must review the author-facing README
   wording; use current `main` for new work until directed otherwise
-- Exact next action: commit the README and gate evidence with sign-off, then
-  request checkpoint acceptance for Gates 7–10
+- Exact next action: request checkpoint acceptance for Gates 7–10; accepted
+  gates move to `hdae/gates-done/`
