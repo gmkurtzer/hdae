@@ -87,6 +87,21 @@ Report the attempts, evidence, alternatives, and recommendation, and persist the
 checkpoint. Difficulty alone is not a blocker; exhaust sensible bounded
 alternatives first.
 
+## Recover context before continuing
+
+At task start and after any compaction, context reset, resume, or handoff,
+reload the complete active copy of this `SKILL.md` before task work continues.
+Then reload repository instructions, any reference this skill requires for the
+active operation, and the authoritative HDAE project checkpoint. Compacted chat
+or a remembered summary is not a substitute for those sources.
+
+Confirm the active gate, scope, status, evidence, open decisions, and exact next
+action against the checkpoint before resuming the inner loop. Every long-running
+checkpoint must identify the active skill, its project discovery path, and that
+reload is required after a context shift. Read the recovery procedure in
+[references/hdae-method.md](references/hdae-method.md) when establishing or
+resuming durable project work.
+
 ## Mandatory gate alignment
 
 Before implementation, align the gates with the human. Skip this only when the
@@ -129,7 +144,8 @@ write or update durable repository files covering:
 - for long projects, traceability from goals through gates, criteria, tasks, and
   evidence, plus a record of approved scope changes;
 - the active checkpoint: current gate, evidence, limitations, open questions,
-  required human decisions, and exact next action.
+  required human decisions, exact next action, active skill and discovery path,
+  and whether skill reload is required after a context shift.
 
 Use existing project conventions when possible. For a small project, one
 `docs/HDAE.md` may be sufficient. For a substantial project without an existing

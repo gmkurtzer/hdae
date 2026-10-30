@@ -60,8 +60,16 @@ discovery links:
 .claude/skills/<name> -> ../../.hdae/skills/<name>  # Claude Code
 ```
 
-Commit `.hdae/`, `.agents/skills/`, and `.claude/skills/` with the project so
-every contributor and CI checkout receives the same skill version.
+For Codex copy installations, the installer also appends a short,
+installer-managed recovery block to the project's `AGENTS.md`. It tells Codex
+to reload the complete HDAE skill and durable project checkpoint after context
+compaction, reset, resume, or handoff. Existing instructions remain in place;
+ambiguous, duplicate, or locally modified managed markers stop the installer
+instead of being overwritten. Uninstall removes only a block owned by HDAE.
+
+Commit `.hdae/`, `.agents/skills/`, `.claude/skills/`, and the managed
+`AGENTS.md` block with the project so every contributor and CI checkout receives
+the same skill version and recovery behavior.
 
 ### Reproducible pinned installation
 
@@ -141,7 +149,10 @@ changes are detected using the recorded skill checksum and block replacement
 unless `--force` is supplied. Checksums include regular-file content and
 symlink targets and are portable across the supported SHA-256 tools. Link mode
 always uses the current checkout, so `--link` cannot be combined with `--update`
-or `--version`. The installer never runs project code.
+or `--version`. The managed `AGENTS.md` recovery block is installed only for
+Codex copy installations; development-link and manual-copy users should add an
+equivalent repository instruction when compaction recovery is required. The
+installer never runs project code.
 
 ## Use HDAE
 

@@ -131,6 +131,38 @@ equivalent. It must answer:
 Persisted state never overrides a newer explicit human decision. Reconcile the
 difference and update the record.
 
+### Context-recovery protocol
+
+Compaction preserves useful task state but is not a verbatim copy of previously
+loaded instructions. At task start and after compaction, context reset, resume,
+or handoff, recover from durable sources in this order:
+
+1. reload the complete active `hdae-development/SKILL.md` from the project's
+   discovery path;
+2. reload applicable repository instructions;
+3. read each skill reference required for the active operation;
+4. read the authoritative project intent, architecture, plan, and checkpoint;
+5. reconcile the active gate, scope, status, evidence, open decisions, and next
+   action before resuming work; and
+6. surface any conflict to the human instead of choosing a version silently.
+
+For long-running work, the checkpoint must include:
+
+```text
+Active skill: hdae-development
+Skill path: <project discovery path to SKILL.md>
+Reload after context shift: required
+Active gate: <name and status>
+Last evidence: <commands and observations>
+Open decisions or limitations: <items or none>
+Exact next action: <one resumable action>
+```
+
+Keep the bootstrap instruction short and durable. The installer-managed
+`AGENTS.md` block exists only to cause this reload; this reference remains the
+single detailed recovery procedure. A checkpoint restores project state, while
+the reloaded skill restores the workflow and authority boundaries.
+
 ## Gate quality
 
 A useful gate is:

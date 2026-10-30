@@ -138,3 +138,66 @@ Gate 2 requirement, task, or acceptance criterion. The convergence amendment
 also passed validation for both skill copies, canonical/installed comparison,
 the full repository check suite, and `git diff --check`. No technical acceptance
 criteria remain open; human acceptance is still required.
+
+## Active gate: context-compaction recovery
+
+Status: passed
+
+Outcome: an HDAE task reliably reloads its complete workflow and durable project
+state after compaction, reset, resume, or handoff without requiring the human to
+notice the context transition.
+
+Scope:
+
+- install a short, bounded HDAE recovery block in `AGENTS.md` for Codex copy
+  installations while preserving unrelated user instructions;
+- track installer ownership so update and uninstall touch only the managed
+  block and refuse ambiguous or locally modified marker state;
+- require complete skill, applicable reference, repository-instruction, and
+  checkpoint reload before resumed work;
+- record the active skill path and reload requirement in long-running
+  checkpoints;
+- document the behavior and cover install, reinstall, conflict, preservation,
+  and uninstall paths with regression tests; and
+- synchronize canonical and installed artifacts and run all validation gates.
+
+Non-goals: platform-level compaction hooks, modifying Claude-specific project
+instructions, guaranteeing the internals of third-party agent harnesses,
+release, version bump, or push.
+
+Task list:
+
+- [x] Define the recovery bootstrap and durable checkpoint contract.
+- [x] Implement safe installer management of the `AGENTS.md` block.
+- [x] Add installer regression tests and user documentation.
+- [x] Synchronize packaged artifacts and validate both skill copies.
+- [x] Run the full project checks and prepare a signed-off commit.
+
+Acceptance requires preservation of pre-existing `AGENTS.md` content,
+idempotent reinstall, safe refusal of modified or malformed managed blocks,
+managed-block removal on uninstall, successful skill validation for canonical
+and installed copies, canonical/installed comparison, `make check`,
+`git diff --check`, and a clean signed-off commit. Stop for human acceptance
+after the gate passes.
+
+Fresh evidence: the canonical and installed skills both passed the skill
+validator; `diff -qr` confirmed the skill copies match; `cmp -s` confirmed the
+canonical and installed installers match; `make check` passed shell syntax,
+ShellCheck, and the full installer integration suite; and `git diff --check`
+passed. The integration suite covered existing instruction preservation,
+idempotent reinstall, malformed-marker preflight, locally modified managed-block
+protection, owned-block uninstall, and preservation of a matching user-owned
+bootstrap. No technical acceptance criteria remain open; human acceptance is
+still required.
+
+Recovery checkpoint:
+
+- Active skill: `hdae-development`
+- Skill path: `.agents/skills/hdae-development/SKILL.md`
+- Reload after context shift: required
+- Active gate: context-compaction recovery (`passed`)
+- Last evidence: both skill validators, canonical/installed comparisons,
+  `make check`, and `git diff --check` passed
+- Open decisions or limitations: platform-level reinjection remains outside
+  this repository's control
+- Exact next action: human review and acceptance of the signed-off gate commit

@@ -14,6 +14,11 @@ trap cleanup EXIT HUP INT TERM
 PROJECT=$TEST_ROOT/project
 mkdir -p "$PROJECT"
 git -C "$PROJECT" init -q
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Project instructions
+
+Keep this user-authored instruction.
+EOF
 
 # Incompatible update and link modes must fail before changing the target.
 UPDATE_LINK_PROJECT=$TEST_ROOT/update-link-project
@@ -43,6 +48,34 @@ fi
 grep -q 'discovery path already exists' "$TEST_ROOT/conflict.out"
 test ! -e "$CONFLICT_PROJECT/.hdae"
 test ! -e "$CONFLICT_PROJECT/.agents"
+
+# Malformed recovery markers must fail before installation changes the target.
+BOOTSTRAP_CONFLICT_PROJECT=$TEST_ROOT/bootstrap-conflict-project
+mkdir -p "$BOOTSTRAP_CONFLICT_PROJECT"
+git -C "$BOOTSTRAP_CONFLICT_PROJECT" init -q
+printf '%s\n' '<!-- hdae:context-recovery:start -->' \
+    >"$BOOTSTRAP_CONFLICT_PROJECT/AGENTS.md"
+if "$REPOSITORY_ROOT/install.sh" --target "$BOOTSTRAP_CONFLICT_PROJECT" \
+    --codex --copy >"$TEST_ROOT/bootstrap-conflict.out" 2>&1; then
+    echo 'malformed HDAE recovery markers did not stop installation' >&2
+    exit 1
+fi
+grep -q 'incomplete or duplicate HDAE recovery markers' \
+    "$TEST_ROOT/bootstrap-conflict.out"
+test ! -e "$BOOTSTRAP_CONFLICT_PROJECT/.hdae"
+test ! -e "$BOOTSTRAP_CONFLICT_PROJECT/.agents"
+
+# A matching pre-existing recovery block is usable but remains user-owned.
+UNOWNED_BOOTSTRAP_PROJECT=$TEST_ROOT/unowned-bootstrap-project
+mkdir -p "$UNOWNED_BOOTSTRAP_PROJECT"
+git -C "$UNOWNED_BOOTSTRAP_PROJECT" init -q
+cp "$REPOSITORY_ROOT/AGENTS.md" "$UNOWNED_BOOTSTRAP_PROJECT/AGENTS.md"
+"$REPOSITORY_ROOT/install.sh" --target "$UNOWNED_BOOTSTRAP_PROJECT" \
+    --codex --copy >"$TEST_ROOT/unowned-bootstrap.out"
+grep -q '^agents_bootstrap=0$' "$UNOWNED_BOOTSTRAP_PROJECT/.hdae/manifest"
+"$REPOSITORY_ROOT/install.sh" --target "$UNOWNED_BOOTSTRAP_PROJECT" \
+    --uninstall >"$TEST_ROOT/unowned-bootstrap-uninstall.out"
+cmp -s "$REPOSITORY_ROOT/AGENTS.md" "$UNOWNED_BOOTSTRAP_PROJECT/AGENTS.md"
 
 # The documented curl-to-shell path must install from standard input without
 # treating files in the target project as the installer source.
@@ -77,13 +110,35 @@ test -f "$PROJECT/.hdae/skills/pr-issue-review/SKILL.md"
 test -L "$PROJECT/.agents/skills/hdae-development"
 test -L "$PROJECT/.claude/skills/pr-issue-review"
 test -f "$PROJECT/.agents/skills/hdae-development/SKILL.md"
+grep -q '^agents_bootstrap=1$' "$PROJECT/.hdae/manifest"
+grep -q '^# Project instructions$' "$PROJECT/AGENTS.md"
+grep -q '^Keep this user-authored instruction\.$' "$PROJECT/AGENTS.md"
+test "$(grep -Fxc '<!-- hdae:context-recovery:start -->' "$PROJECT/AGENTS.md")" -eq 1
+test "$(grep -Fxc '<!-- hdae:context-recovery:end -->' "$PROJECT/AGENTS.md")" -eq 1
 
 # Reinstalling an unchanged managed copy must be idempotent.
 "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy
+test "$(grep -Fxc '<!-- hdae:context-recovery:start -->' "$PROJECT/AGENTS.md")" -eq 1
 
 # The installed entry point must also support an idempotent local reinstall.
 "$PROJECT/.hdae/install.sh" --target "$PROJECT" --all --copy
 grep -q '^version=0.1.1$' "$PROJECT/.hdae/manifest"
+
+# Local changes inside the installer-managed bootstrap must be protected.
+cp "$PROJECT/AGENTS.md" "$TEST_ROOT/agents-managed"
+awk '
+    /^<!-- hdae:context-recovery:end -->$/ { print "local managed-block change" }
+    { print }
+' "$PROJECT/AGENTS.md" >"$TEST_ROOT/agents-modified"
+cp "$TEST_ROOT/agents-modified" "$PROJECT/AGENTS.md"
+if "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy \
+    >"$TEST_ROOT/agents-modified.out" 2>&1; then
+    echo 'modified AGENTS.md recovery block was not protected' >&2
+    exit 1
+fi
+grep -q 'installer-managed HDAE block in AGENTS.md was modified' \
+    "$TEST_ROOT/agents-modified.out"
+cp "$TEST_ROOT/agents-managed" "$PROJECT/AGENTS.md"
 
 # Added symlinks, including their targets, are part of the managed tree digest.
 ln -s SKILL.md "$PROJECT/.hdae/skills/hdae-development/local-link"
@@ -122,6 +177,13 @@ fi
 test ! -e "$PROJECT/.hdae/skills"
 test ! -e "$PROJECT/.agents/skills/hdae-development"
 test ! -e "$PROJECT/.claude/skills/pr-issue-review"
+test -f "$PROJECT/AGENTS.md"
+grep -q '^# Project instructions$' "$PROJECT/AGENTS.md"
+grep -q '^Keep this user-authored instruction\.$' "$PROJECT/AGENTS.md"
+if grep -Fq '<!-- hdae:context-recovery:' "$PROJECT/AGENTS.md"; then
+    echo 'uninstall left the installer-managed AGENTS.md block behind' >&2
+    exit 1
+fi
 
 # Link mode must expose both skills from a project-local HDAE checkout.
 LINK_PROJECT=$TEST_ROOT/link-project

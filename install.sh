@@ -20,6 +20,9 @@ UPDATE=0
 UNINSTALL=0
 FORCE=0
 TEMP_DIR=
+BOOTSTRAP_START='<!-- hdae:context-recovery:start -->'
+BOOTSTRAP_END='<!-- hdae:context-recovery:end -->'
+BOOTSTRAP_MANAGED=0
 
 usage() {
     cat <<EOF
@@ -107,6 +110,78 @@ remove_managed_link() {
     fi
 }
 
+print_agents_bootstrap() {
+    cat <<'EOF'
+<!-- hdae:context-recovery:start -->
+## HDAE context recovery
+
+For every task that uses HDAE, and after any context compaction, reset, resume,
+or handoff, read `.agents/skills/hdae-development/SKILL.md` completely before
+continuing. Then read the skill-directed references and authoritative HDAE
+project checkpoint. Do not rely on compacted chat as a substitute.
+<!-- hdae:context-recovery:end -->
+EOF
+}
+
+extract_agents_bootstrap() {
+    file=$1
+    sed -n "/^${BOOTSTRAP_START}$/,/^${BOOTSTRAP_END}$/p" "$file"
+}
+
+validate_agents_bootstrap() {
+    file=$TARGET/AGENTS.md
+    [ ! -L "$file" ] || die "refusing to modify symlinked AGENTS.md: $file"
+    [ ! -e "$file" ] || [ -f "$file" ] || die "AGENTS.md is not a regular file: $file"
+    [ -f "$file" ] || return 0
+
+    start_count=$(grep -Fxc "$BOOTSTRAP_START" "$file" || true)
+    end_count=$(grep -Fxc "$BOOTSTRAP_END" "$file" || true)
+    if [ "$start_count" -eq 0 ] && [ "$end_count" -eq 0 ]; then
+        return
+    fi
+    if [ "$start_count" -ne 1 ] || [ "$end_count" -ne 1 ]; then
+        die "AGENTS.md contains incomplete or duplicate HDAE recovery markers"
+    fi
+
+    recorded_managed=$(manifest_value agents_bootstrap "$MANIFEST" || true)
+    recorded_digest=$(manifest_value agents_bootstrap_digest "$MANIFEST" || true)
+    current_digest=$(extract_agents_bootstrap "$file" | sha256_stream)
+    desired_digest=$(print_agents_bootstrap | sha256_stream)
+    if [ "$recorded_managed" = 1 ]; then
+        if [ "$FORCE" -ne 1 ] && { [ -z "$recorded_digest" ] || [ "$recorded_digest" != "$current_digest" ]; }; then
+            die "installer-managed HDAE block in AGENTS.md was modified; inspect it or rerun with --force"
+        fi
+        BOOTSTRAP_MANAGED=1
+    elif [ "$current_digest" != "$desired_digest" ]; then
+        die "AGENTS.md already contains unmanaged HDAE recovery markers"
+    fi
+}
+
+remove_agents_bootstrap() {
+    file=$TARGET/AGENTS.md
+    [ -f "$file" ] || return 0
+    temp=$file.hdae.$$
+    sed "/^${BOOTSTRAP_START}$/,/^${BOOTSTRAP_END}$/d" "$file" >"$temp"
+    cat "$temp" >"$file"
+    rm -f "$temp"
+    [ -s "$file" ] || rm -f "$file"
+}
+
+install_agents_bootstrap() {
+    file=$TARGET/AGENTS.md
+    if [ "$BOOTSTRAP_MANAGED" -eq 1 ]; then
+        remove_agents_bootstrap
+    elif [ -f "$file" ] && grep -Fqx "$BOOTSTRAP_START" "$file"; then
+        return
+    fi
+
+    if [ -s "$file" ]; then
+        printf '\n' >>"$file"
+    fi
+    print_agents_bootstrap >>"$file"
+    BOOTSTRAP_MANAGED=1
+}
+
 for argument in "$@"; do
     case "$argument" in
         --all) INSTALL_CODEX=1; INSTALL_CLAUDE=1 ;;
@@ -169,10 +244,17 @@ if [ "$UNINSTALL" -eq 1 ]; then
     if [ "$FORCE" -ne 1 ] && [ "$installed_digest" != "$current_digest" ]; then
         die "installed skills were modified; inspect them or rerun with --force"
     fi
+    bootstrap_managed=$(manifest_value agents_bootstrap "$MANIFEST" || true)
+    if [ "$bootstrap_managed" = 1 ]; then
+        validate_agents_bootstrap
+    fi
     remove_managed_link "$TARGET/.agents/skills/hdae-development" "../../.hdae/skills/hdae-development"
     remove_managed_link "$TARGET/.agents/skills/pr-issue-review" "../../.hdae/skills/pr-issue-review"
     remove_managed_link "$TARGET/.claude/skills/hdae-development" "../../.hdae/skills/hdae-development"
     remove_managed_link "$TARGET/.claude/skills/pr-issue-review" "../../.hdae/skills/pr-issue-review"
+    if [ "$bootstrap_managed" = 1 ]; then
+        remove_agents_bootstrap
+    fi
     rm -rf "$HDAE_DIR/skills"
     rm -f "$HDAE_DIR/install.sh" "$HDAE_DIR/VERSION" "$MANIFEST"
     rmdir "$HDAE_DIR" 2>/dev/null || true
@@ -262,6 +344,9 @@ validate_link() {
 if [ "$INSTALL_CODEX" -eq 1 ]; then
     validate_link "$TARGET/.agents" hdae-development
     validate_link "$TARGET/.agents" pr-issue-review
+    if [ "$MODE" = copy ]; then
+        validate_agents_bootstrap
+    fi
 fi
 
 if [ "$INSTALL_CLAUDE" -eq 1 ]; then
@@ -315,6 +400,9 @@ install_link() {
 if [ "$INSTALL_CODEX" -eq 1 ]; then
     install_link "$TARGET/.agents" hdae-development
     install_link "$TARGET/.agents" pr-issue-review
+    if [ "$MODE" = copy ]; then
+        install_agents_bootstrap
+    fi
 fi
 
 if [ "$INSTALL_CLAUDE" -eq 1 ]; then
@@ -329,6 +417,8 @@ version=$INSTALLED_VERSION
 source=$SOURCE_LABEL
 mode=copy
 skills_digest=$digest
+agents_bootstrap=$BOOTSTRAP_MANAGED
+agents_bootstrap_digest=$(print_agents_bootstrap | sha256_stream)
 EOF
 fi
 
