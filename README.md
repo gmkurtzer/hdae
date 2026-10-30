@@ -72,12 +72,12 @@ Install the HDAE skills into this project from https://github.com/gmkurtzer/hdae
 
 The installer copies the canonical skills into `.hdae/skills/`, records their
 source and checksum in `.hdae/manifest`, and creates Git-compatible relative
-discovery links. It does not copy itself into the target project:
+discovery links. For each skill, it creates links at:
 
-```text
-.agents/skills/<name> -> ../../.hdae/skills/<name>  # Codex
-.claude/skills/<name> -> ../../.hdae/skills/<name>  # Claude Code
-```
+- `.agents/skills/<name>` for Codex
+- `.claude/skills/<name>` for Claude Code
+
+It does not copy itself into the target project.
 
 For Codex copy installations, the installer also appends a short,
 installer-managed recovery block to the project's `AGENTS.md`. It tells Codex
