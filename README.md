@@ -111,19 +111,6 @@ The installer configures Codex and Claude Code to use the same canonical skill
 copies. It does not overwrite an existing installation unless its recorded
 checksum still matches or `--force` is explicitly supplied.
 
-### Development link
-
-To track or modify HDAE from within a project, clone it directly into `.hdae`
-and link the agents to that checkout:
-
-```sh
-git clone https://github.com/gmkurtzer/hdae.git .hdae
-./.hdae/install.sh --all --link
-```
-
-This mode preserves the HDAE Git checkout. It is best for contributing to HDAE,
-while copy mode is better for reproducible project use.
-
 ### Copy without the installer
 
 A skill is a complete directory. To install one skill manually for Codex:
@@ -150,7 +137,6 @@ Copy the complete directory, including `SKILL.md`, `agents/`, and
 ./install.sh --all --copy            Install for Codex and Claude Code
 ./install.sh --codex --copy          Compatibility alias for --all
 ./install.sh --claude --copy         Compatibility alias for --all
-./install.sh --all --link            Link to this HDAE checkout
 ./install.sh --target /path/project  Select the target repository
 ./install.sh --uninstall             Remove an installer-managed copy
 ```
@@ -158,10 +144,10 @@ Copy the complete directory, including `SKILL.md`, `agents/`, and
 Local changes are detected using the recorded skill checksum and block
 replacement unless `--force` is supplied. Checksums include regular-file
 content and symlink targets and are portable across the supported SHA-256
-tools. The managed `AGENTS.md` recovery block is installed only for Codex copy
-installations; development-link and manual-copy users should add an equivalent
-repository instruction when compaction recovery is required. The installer
-never runs project code and never installs itself into a managed copy.
+tools. The managed `AGENTS.md` recovery block is installed for Codex; users who
+copy skills manually should add an equivalent repository instruction when
+compaction recovery is required. The installer never runs project code and
+never installs itself into a managed copy.
 
 ## Use HDAE
 
@@ -233,9 +219,9 @@ was configured by an older HDAE version; these compatibility aliases now repair
 and configure both supported discovery roots. The HDAE development skill knows
 this procedure and can perform it when directed. Review skill changes like any
 other dependency update before committing them. The installer is fetched for
-each update and is not stored in the target project. For a development checkout
-cloned directly into `.hdae`, update that checkout with Git and rerun its source
-`./.hdae/install.sh --all --link`.
+each update and is not stored in the target project. An installer run directly
+from a separately checked-out HDAE repository performs the same copy-based
+installation.
 
 ## Project status
 

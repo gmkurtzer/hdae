@@ -17,7 +17,7 @@ acceptance while agents execute bounded implementation and verification loops.
 ## Scope
 
 - The `hdae-development` and `pr-issue-review` skills.
-- Portable copy and development-link installation.
+- Portable copy installation.
 - Durable project-control records under `hdae/`.
 - Repeatable verification and human-confirmed checkpoint boundaries.
 

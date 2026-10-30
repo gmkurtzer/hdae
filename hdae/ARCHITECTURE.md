@@ -9,6 +9,8 @@
   same canonical skill copies; selector flags are compatibility aliases only.
 - `install.sh` is the external canonical installer and is never copied into a
   managed project installation.
+- `.hdae/` contains managed installation data only: no source checkout, no
+  installer copy, and no installer-ownership metadata.
 
 Canonical and installed copies must be reconciled before a gate passes.
 
@@ -38,6 +40,7 @@ must not duplicate those facts in identifiers, ordering fields, or gate indexes.
 - Every acceptance criterion has fresh evidence before technical passage.
 - Blockers, failed dependencies, scope changes, and consequential decisions stop
   automatic advancement unless the confirmed policy explicitly covers them.
-- Installer changes preserve user content and avoid known partial-state failures.
+- Installer changes preserve user content outside managed installation paths
+  and avoid known partial-state failures.
 - Copy-install updates run the current canonical installer from outside the
   target, normally through the documented GitHub `main` shell pipe.

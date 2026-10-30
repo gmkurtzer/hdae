@@ -29,12 +29,12 @@ installer-copy metadata.
 - [x] Confirmed current `main` branch with no pull request.
 - [x] Establish a passing baseline and inventory affected behavior.
 - [x] Remove link mode and installer-copy metadata.
-- [ ] Update documentation, skills, and tests.
-- [ ] Synchronize installed skills and run complete verification.
+- [x] Update documentation, skills, and tests.
+- [x] Synchronize installed skills and run complete verification.
 
 ## Remaining work
 
-- [ ] Complete implementation and technical evidence.
+- [x] Complete implementation and technical evidence.
 - [ ] Obtain human checkpoint review.
 
 ## Acceptance criteria
@@ -56,6 +56,19 @@ installer-copy metadata.
 - `--link` now fails before changing the target.
 - Direct execution from a separate checkout installs copied skills without
   creating `.hdae/install.sh`.
+- `diff -qr skills .hdae/skills`: passed; canonical and installed skills match.
+- Discovery-link and manifest inspection: passed; both agent roots resolve to
+  `.hdae/skills`, `.hdae/install.sh` is absent, and the manifest has no obsolete
+  ownership field.
+- Skill frontmatter validation: passed with Ruby's YAML parser. The standard
+  `quick_validate.py` could not start because its runtime lacks PyYAML; it made
+  no changes.
+- Final `make check`: passed shell syntax, ShellCheck, and installer integration
+  tests.
+- Final `git diff --check`: passed.
+- Coverage: installation, rejection of removed mode, legacy migration, update,
+  uninstall, agent discovery, documentation, and skill synchronization passed;
+  security, privacy, performance, and deployment changes were not applicable.
 
 ## Decisions and limitations
 
@@ -70,10 +83,11 @@ installer-copy metadata.
 - Pull request: not intended.
 - Planned commits: copy-only installer and regression tests; documentation,
   synchronized skills, and final gate evidence.
-- Actual commits: pending.
+- Actual commits: `0a7816d` (copy-only installer and regression tests); this
+  commit (documentation, synchronized skills, and final evidence).
 
 ## Review policy and outcome
 
 Checkpoint review because this removes a supported installation mode and
-changes migration behavior. Implementation is approved; technical passage and
-human review are pending.
+changes migration behavior. Gate 11 has technically passed; human review is
+pending.

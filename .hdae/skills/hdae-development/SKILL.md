@@ -141,19 +141,14 @@ same `.hdae/skills/` copies; `--codex` and `--claude` are compatibility aliases
 for `--all`, not selective installs.
 
 Afterward, verify every configured discovery link, `.hdae/manifest`, and skill
-contents; confirm the installer did not leave a managed `.hdae/install.sh`; if
-a manifest already declared `installer_copy=0` and a file existed there,
-confirm that user-owned file stayed unchanged. Immediately reload the complete
-newly installed `hdae-development/SKILL.md` through the active agent discovery
-path and read every reference it requires for the current operation before
-continuing. Do this in the current turn when the environment permits it. If the
-runtime cannot reload a changed skill, stop and give the human the exact command
-or restart action needed before claiming the update is active. Review the
-dependency diff and commit only when authorized by repository practice.
-
-A development-link installation is a source checkout rather than a managed
-copy: update that checkout with Git and rerun its source installer with `--all
---link` instead of using this copy-update command, then perform the same reload.
+contents; confirm `.hdae/install.sh` is absent and the manifest contains no
+installer-copy ownership field. Immediately reload the complete newly installed
+`hdae-development/SKILL.md` through the active agent discovery path and read
+every reference it requires for the current operation before continuing. Do
+this in the current turn when the environment permits it. If the runtime cannot
+reload a changed skill, stop and give the human the exact command or restart
+action needed before claiming the update is active. Review the dependency diff
+and commit only when authorized by repository practice.
 
 ## Check HDAE for updates
 
@@ -190,10 +185,6 @@ esac
 Capture `diff` status `0` as current and status `1` as content differences;
 other statuses mean the check failed. Remove only the validated directory made
 by `mktemp`, including on interruption or a failed comparison.
-
-For a development-link installation, also report the checkout's current branch
-and dirty state. Compare content to upstream `main`; do not fetch into, merge,
-or otherwise mutate that checkout merely to check.
 
 ## Choose gate delivery strategy
 
