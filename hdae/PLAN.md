@@ -17,8 +17,10 @@ it does not duplicate the gate list or lifecycle state.
    references.
 3. Persist enough project and gate state for reliable recovery after context
    compaction, reset, resume, or handoff.
-4. Require fresh technical evidence and separate human acceptance for every
-   gate.
+4. Require fresh technical evidence for every gate and human-confirmed review
+   boundaries for each execution batch.
+5. Continue automatically through passed gates only when the batch's confirmed
+   checkpoint map delegates that authority.
 
 ## Scope changes
 

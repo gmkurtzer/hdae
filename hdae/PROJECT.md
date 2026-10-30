@@ -19,11 +19,12 @@ acceptance while agents execute bounded implementation and verification loops.
 - The `hdae-development` and `pr-issue-review` skills.
 - Portable copy and development-link installation.
 - Durable project-control records under `hdae/`.
-- Repeatable verification and human acceptance boundaries.
+- Repeatable verification and human-confirmed checkpoint boundaries.
 
 ## Non-goals
 
 - Replacing human product or architecture decisions.
-- Treating technical verification as human acceptance.
+- Treating technical verification as human review when a checkpoint was
+  required.
 - Hiding project state in chat, generated indexes, or external services.
 - Automatically publishing releases or pushing repository changes.

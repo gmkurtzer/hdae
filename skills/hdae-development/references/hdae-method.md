@@ -11,7 +11,7 @@ The human provides:
 - domain knowledge and important real-world constraints;
 - architectural direction, trust boundaries, and product tradeoffs;
 - priorities, non-goals, and acceptable risk;
-- acceptance of completed gates and direction for the next gate.
+- the gates authorized for execution and where human review is required.
 
 The agent provides:
 
@@ -75,8 +75,9 @@ hdae/
 The path is authoritative metadata:
 
 - `gates-todo/` means the gate is actionable, blocked, failed, or technically
-  passed but still awaiting human acceptance;
-- `gates-done/` means the human accepted the gate; and
+  passed but has not reached its confirmed closure boundary;
+- `gates-done/` means the gate passed and was either accepted at a checkpoint or
+  closed under a human-confirmed batch delegation; and
 - `gates-deferred/` means the human intentionally postponed it and the file
   records why and what should cause reconsideration.
 
@@ -95,7 +96,7 @@ find hdae/gates-* -type f -name '*.md' -print |
     LC_ALL=C sort -t/ -k3,3n
 ```
 
-Find the earliest gate that is not yet accepted or deferred:
+Find the earliest open gate:
 
 ```sh
 find hdae/gates-todo -type f -name '*.md' -print |
@@ -120,11 +121,12 @@ printf '%s\n' "$next"
 ```
 
 For insertion, calculate a decimal strictly between the neighboring prefixes
-and confirm no gate already uses it before creating the file. The gate stays in
-`gates-todo/` after technical passage. Move it to `gates-done/` only after
-explicit human acceptance. Move it to `gates-deferred/` only after explicit
-deferral, retaining the same filename, and return it to `gates-todo/` when the
-recorded condition is met.
+and confirm no gate already uses it before creating the file. Technical passage
+alone leaves a gate in `gates-todo/`. Move it to `gates-done/` only after human
+acceptance at a checkpoint or automatic closure authorized by the confirmed
+batch policy. Move it to `gates-deferred/` only after explicit deferral,
+retaining the same filename, and return it to `gates-todo/` when the recorded
+condition is met.
 
 The gate body owns substantive information, not routing metadata:
 
@@ -144,7 +146,7 @@ The gate body owns substantive information, not routing metadata:
 - [x] <Finished task.>
 
 ## Remaining work
-- [ ] <Unfinished task or human acceptance.>
+- [ ] <Unfinished task or required review.>
 
 ## Acceptance criteria
 - <Positive, negative, and regression behavior.>
@@ -155,8 +157,8 @@ The gate body owns substantive information, not routing metadata:
 ## Decisions and limitations
 - <Material decision, failure, limitation, or deferral condition.>
 
-## Human review
-<Approval, correction, technical passage awaiting acceptance, or deferral.>
+## Review policy and outcome
+<Checkpoint or delegated completion policy, its authorization, and outcome.>
 ```
 
 Do not create generated todo/done indexes. The lifecycle directories and
@@ -173,6 +175,7 @@ verification, and stop point may be sufficient. For a long project, persist:
 - an ordered gate map with dependencies;
 - a task list with pending, active, blocked, and completed states;
 - acceptance criteria and required evidence;
+- the proposed checkpoint map for any multi-gate execution batch;
 - progress checkpoints, risks, decisions, and scope changes; and
 - the current next action.
 
@@ -296,7 +299,7 @@ omissions before implementation. Use this sequence:
 3. present the complete proposed gate map and dependencies;
 4. show the coverage review below;
 5. ask what is missing or incorrectly scoped; and
-6. ask which specific gate is approved to begin.
+6. ask which gates may run as one batch and where human review is required.
 
 The coverage review considers each relevant surface:
 
@@ -316,13 +319,50 @@ At gate completion, repeat the coverage review against the approved scope and
 show evidence for every acceptance criterion. Missing or unverified work keeps
 the gate partial.
 
+## Multi-gate batches and checkpoint policy
+
+A human may authorize one gate, a numeric range, or all current todo gates. Do
+not interpret that request as permission to skip planning or choose review
+boundaries silently. Before execution:
+
+1. list the included gates in numeric order and check their dependencies;
+2. summarize the work, expected evidence, risks, and batch stopping conditions;
+3. propose `checkpoint` or `delegated` review for each gate; and
+4. ask the human to confirm the exact batch and checkpoint map.
+
+Recommend `checkpoint` when a gate contains an unresolved product or
+architecture choice, subjective user acceptance, security or privacy risk, data
+migration, irreversible change, consequential external effect, material scope
+change, or an explicitly requested review. Recommend `delegated` only when the
+work is objective, reversible, already within approved scope, fully testable,
+and requires no new consequential decision. The human may override the proposal
+before execution; persist the confirmed policy in each affected gate.
+
+Execute the confirmed batch in numeric order. After each gate:
+
+- record fresh evidence and reconcile every criterion;
+- stop if a checkpoint gate passes and request review;
+- if a delegated gate passes, record delegated closure, move it to
+  `gates-done/`, and continue without asking again;
+- stop when failure or blockage invalidates a dependency or later evidence;
+- stop for any new decision, permission, scope, risk, or external effect outside
+  the confirmed policy; and
+- update `STATUS.md` with the current gate and next resumable action.
+
+Do not silently skip a failed gate. Independent later gates may continue only
+when the confirmed batch policy explicitly permits that behavior and the
+failure cannot invalidate them. At the end, report each gate's passed, closed,
+failed, blocked, deferred, or still-open state and the evidence supporting it.
+Batch confirmation expires when the included gates finish or the agreed scope
+or checkpoint map changes.
+
 ## Closed-loop execution
 
 The outer human loop is:
 
 ```text
-intent -> architecture and constraints -> gate -> observed evidence
-       -> human review and direction -> next gate
+intent -> architecture and constraints -> gate batch and checkpoint map
+       -> observed evidence -> agreed review boundary -> direction
 ```
 
 The inner agent loop is:
@@ -332,8 +372,10 @@ implement -> build/run -> observe -> diagnose -> revise -> verify
 ```
 
 The agent may repeat the inner loop without hand-holding while it remains inside
-the approved gate. It returns to the outer loop when the gate passes, a human
-decision is required, or continued iteration would weaken scope or evidence.
+the approved gate. In a confirmed batch it may advance through passed delegated
+gates. It returns to the outer loop at a checkpoint, when the batch ends, when a
+human decision is required, or when continued iteration would weaken scope or
+evidence.
 
 ## Convergence and stall control
 
@@ -364,7 +406,7 @@ Stop the inner loop and return to the human when any of these conditions holds:
 - the expected time or token cost is disproportionate to the gate's value or
   remaining uncertainty;
 - no credible in-scope alternative remains; or
-- the gate has passed and reached its human-review boundary.
+- the gate has passed and reached a confirmed checkpoint, or the batch ended.
 
 Difficulty, an initial failure, or an uncertain diagnosis is not by itself a
 reason to stop. Exhaust sensible bounded alternatives first. At escalation,
@@ -377,6 +419,8 @@ not silently cross the gate boundary or broaden the plan.
 
 - **Passed:** all mandatory criteria ran and succeeded.
 - **Accepted:** the human reviewed and accepted a passed gate.
+- **Closed:** a passed gate was accepted or completed under a human-confirmed
+  batch delegation.
 - **Failed:** at least one mandatory criterion ran and failed.
 - **Blocked:** an external dependency or required decision prevents execution.
 - **Not run:** verification has not occurred.
@@ -384,7 +428,8 @@ not silently cross the gate boundary or broaden the plan.
 
 Time spent, code volume, or near-success does not complete a gate.
 
-At a gate boundary, report the gate and status first, then delivered work,
-evidence, coverage, repository or artifact state, incomplete or unverified
-items, and the exact decision or next action required from the human. Passing a
-gate never silently authorizes the next one.
+At a checkpoint or batch boundary, report the gate and status first, then
+delivered work, evidence, coverage, repository or artifact state, incomplete or
+unverified items, and the exact decision or next action required from the human.
+Passing a gate authorizes the next one only when the confirmed batch policy says
+so.

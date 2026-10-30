@@ -3,11 +3,11 @@
 - Active skill: `hdae-development`
 - Skill path: `.agents/skills/hdae-development/SKILL.md`
 - Reload after context shift: required
-- Active gate: `hdae/gates-todo/5-gate-ledger.md`
-- Current state: technically passed; human acceptance pending
-- Last evidence: Gate 5 passed numeric discovery and append tests, both skill
-  validators, canonical/installed comparisons, `make check`, completeness
-  audits, and `git diff --check`
+- Active gate: `hdae/gates-todo/6-multi-gate-batches.md`
+- Current state: technically passed; checkpoint review pending
+- Last evidence: Gate 6 passed scenario review, both skill validators,
+  canonical/installed comparisons, `make check`, completeness audits, and
+  `git diff --check`
 - Open decisions or limitations: none
-- Exact next action: human review of technically passed Gates 3, 4, and 5;
-  accepted gates move from `gates-todo/` to `gates-done/`
+- Exact next action: human review of Gate 6 and confirmation of which pending
+  gates should close or run in a delegated batch

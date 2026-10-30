@@ -175,7 +175,8 @@ Claude Code:
 The initial request can be that simple. The skill directs the agent to inspect
 the project, interview the human until the outcome and constraints are clear,
 persist the shared understanding, propose complete gates, and ask which gate is
-approved. Implementation stops at every gate boundary for human evaluation.
+approved. The human confirms which gate boundaries need review and which may
+advance automatically inside an approved batch.
 
 HDAE project-control state lives under root `hdae/`, separate from the installed
 tooling in `.hdae/`. Gate files live in `hdae/gates-todo/`,
@@ -183,6 +184,12 @@ tooling in `.hdae/`. Gate files live in `hdae/gates-todo/`,
 component defines execution order. The skill uses portable shell commands to
 discover the next gate and insert work without generated indexes or renumbering
 unrelated gates.
+
+For multi-gate work, the agent first proposes the ordered batch and identifies
+which gates need human checkpoints. After the user confirms that map, passed
+non-checkpoint gates can close and advance automatically; checkpoint gates,
+blockers, failed dependencies, and new consequential decisions still stop for
+direction.
 
 ### Configure recurring PR and issue review
 

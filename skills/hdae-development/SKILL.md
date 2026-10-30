@@ -7,9 +7,9 @@ description: Apply Human-Directed Agentic Engineering by interviewing the human 
 
 Human-Directed Agentic Engineering (HDAE) combines informed human direction
 with bounded agent autonomy. The human owns product intent, domain decisions,
-architecture, constraints, priorities, and acceptance. The agent turns that
-direction into artifacts and code, runs repeatable implementation and diagnosis
-loops, and presents evidence at agreed boundaries.
+architecture, constraints, priorities, and review boundaries. The agent turns
+that direction into artifacts and code, runs repeatable implementation and
+diagnosis loops, and presents evidence at agreed boundaries.
 
 HDAE is not continual approval of individual edits, and it is not unguided
 "vibe coding." Give the agent room to iterate inside an approved gate while
@@ -23,7 +23,7 @@ records rather than creating parallel documents.
 
 - **Establish:** turn an idea into product intent, architecture, constraints,
   milestones, and executable gates.
-- **Implement:** execute only the active human-approved gate.
+- **Implement:** execute the approved gate or ordered gate batch.
 - **Verify:** independently determine whether a gate passed.
 - **Maintain:** convert defects, requests, and operational evidence into new
   bounded gates without losing the original architecture.
@@ -106,24 +106,47 @@ resuming durable project work.
 
 Every approved gate must have one authoritative Markdown file under the
 project's root `hdae/` directory. The directory is lifecycle state:
-`gates-todo/` contains all work not yet accepted, `gates-done/` contains only
-human-accepted gates, and `gates-deferred/` contains intentionally postponed
-gates. The leading decimal filename component is execution position. Do not
-duplicate path-derived lifecycle or order in gate indexes or metadata fields.
+`gates-todo/` contains open work, `gates-done/` contains passed gates closed by
+human review or confirmed batch delegation, and `gates-deferred/` contains
+intentionally postponed gates. The leading decimal filename component is
+execution position. Do not duplicate path-derived lifecycle or order in gate
+indexes or metadata fields.
 
 Keep completed work, remaining work, criteria, evidence, decisions, limitations,
-and human review in that gate file. A technically passed gate remains in
-`gates-todo/` until the human accepts it. Move a gate to `gates-deferred/` only
-with the reason and return condition recorded; move it back to `gates-todo/`
-when reactivated. Read the gate-ledger procedure and shell commands in
+and review policy in that gate file. A technically passed gate remains in
+`gates-todo/` until it reaches its confirmed review boundary: explicit human
+acceptance for a checkpoint gate or automatic closure for a delegated gate.
+Move a gate to `gates-deferred/` only with the reason and return condition
+recorded; move it back to `gates-todo/` when reactivated. Read the gate-ledger
+procedure and shell commands in
 [references/hdae-method.md](references/hdae-method.md) before creating,
 inserting, selecting, deferring, completing, or migrating gates.
+
+## Align batches and checkpoints
+
+When the human requests several gates, a range, or all todo gates, inspect them
+in numeric order and propose one execution batch before starting. Show the
+included gates, dependencies, expected work, acceptance evidence, and a
+checkpoint map. Recommend a checkpoint for gates involving unresolved product
+or architecture decisions, subjective user acceptance, security or privacy
+risk, migrations, irreversible or consequential external effects, material
+scope changes, or any boundary the human requested. Recommend automatic
+completion only for objective, reversible, in-scope work with complete criteria
+and no new consequential decision.
+
+Ask the human to confirm both the batch and checkpoint map. That confirmation
+may delegate closure of passed non-checkpoint gates and advancement to the next
+gate in this batch only. It does not authorize future gates, failed criteria,
+scope expansion, consequential external action, or bypassing a required
+permission. If the conversation already confirms the exact batch and map, do
+not ask again. Read the multi-gate procedure in
+[references/hdae-method.md](references/hdae-method.md) before running a batch.
 
 ## Mandatory gate alignment
 
 Before implementation, align the gates with the human. Skip this only when the
-current conversation already contains an explicit approval of the exact active
-gate and its acceptance criteria.
+current conversation already contains explicit approval of the exact gate or
+batch, its acceptance criteria, and its checkpoint map.
 
 1. Restate the outcome and important constraints in plain language.
 2. Ask focused questions about missing product behavior, architecture,
@@ -133,16 +156,17 @@ gate and its acceptance criteria.
    plan.
 4. Present a proposed gate map in plain, concrete language. For every gate show
    its goal, observable outcome, included and excluded work, dependencies,
-   deliverables, acceptance evidence, and stopping point. For substantial work,
-   also show the ordered plan and task list that implement the gates.
+   deliverables, acceptance evidence, and proposed review policy. For
+   substantial work, also show the ordered plan and task list that implement the
+   gates.
 5. Perform a coverage review across functionality, failure behavior,
    regression testing, user workflow, documentation, compatibility or
    migration, and operational or security concerns when relevant. Mark a
    category not applicable rather than silently omitting it.
-6. Explicitly ask the human: “What is missing or incorrectly scoped, and which
-   gate may begin?”
+6. Explicitly ask the human: “What is missing or incorrectly scoped, which
+   gates may run, and where should I stop for review?”
 7. Wait for approval. Do not treat silence, general enthusiasm, or approval of
-   the overall idea as approval to implement every gate.
+   the overall idea as approval of a gate batch or checkpoint map.
 
 When the human adds or changes a requirement, update the affected gate map and
 acceptance criteria. If the change is material, obtain approval before
@@ -207,11 +231,11 @@ durable handoff.
 Read [references/hdae-method.md](references/hdae-method.md) when designing or
 assessing the project process.
 
-## Implement an approved gate
+## Implement an approved gate or batch
 
-1. Restate the human-approved active gate, scope, invariants, and acceptance
-   commands, and create or locate its `gates-todo/` record. If any are missing,
-   return to gate alignment.
+1. Restate the human-approved gate or batch, checkpoint map, scope, invariants,
+   and acceptance commands, and create or locate each `gates-todo/` record. If
+   any are missing, return to gate alignment.
 2. Reproduce the current behavior or missing capability when practical.
 3. Implement the narrowest coherent change that can satisfy the gate.
 4. Iterate autonomously within that boundary under the convergence rules:
@@ -228,11 +252,12 @@ assessing the project process.
 9. Reconcile source, generated, vendored, and installed copies when relevant;
    inspect documentation, repository state, commits, and temporary artifacts.
 10. Update the gate file's completed work, remaining work, evidence, decisions,
-    limitations, human-review state, and exact next action, plus `STATUS.md`.
-11. Present a completion summary naming delivered work, evidence, coverage,
-    repository state, remaining work, and the exact human decision required.
-    Stop at the gate boundary and let the human accept, reject, redirect, or
-    reprioritize the next work.
+    limitations, review policy and outcome, and exact next action, plus
+    `STATUS.md`.
+11. At a checkpoint gate, present the completion summary and stop for human
+    review. At a delegated gate, move it to `gates-done/` only after it passes,
+    record that it closed under the confirmed batch policy, and continue to the
+    next authorized gate. At batch completion, summarize every gate and stop.
 
 Return immediately for human direction when work would change the architecture,
 expand product scope, weaken an acceptance criterion, require consequential
@@ -243,12 +268,15 @@ external action, or choose among materially different product outcomes.
 Verify observable behavior from a clean and relevant state. A gate is
 **passed** only when every mandatory criterion ran and succeeded; otherwise use
 **failed**, **blocked**, **not run**, or **partial** precisely.
-**Accepted** is separate: it means the human reviewed and accepted a passed
-gate. Never imply that technical passage is human acceptance.
+**Accepted** means the human reviewed and accepted a passed checkpoint gate.
+**Closed** means a passed gate was either accepted or completed under a
+human-confirmed batch delegation. Never imply that delegated closure was
+individual human review.
 
 A gate cannot pass until its authoritative file records every criterion and the
-fresh evidence that satisfied it. Technical passage leaves the file in
-`gates-todo/`; only explicit human acceptance moves it to `gates-done/`.
+fresh evidence that satisfied it. Technical passage alone leaves the file in
+`gates-todo/`; acceptance or confirmed delegated closure moves it to
+`gates-done/`.
 
 For maintenance, connect each issue or request to the authoritative product and
 architecture documents. Add the smallest gate that reproduces the problem,

@@ -26,9 +26,13 @@ must not duplicate those facts in identifiers, ordering fields, or gate indexes.
 
 ## Invariants
 
-- Only human acceptance moves a gate into `gates-done/`.
-- A technically passed gate remains in `gates-todo/` while acceptance is pending.
+- A gate moves into `gates-done/` only after it passes and is either accepted at
+  a checkpoint or automatically closed under a user-confirmed batch policy.
+- Before a batch begins, the human confirms its gate range and checkpoint map.
+- Automatic completion authority applies only to the confirmed batch.
 - Deferral records a reason and a condition for reconsideration.
 - Decimal positions are unique and unnecessary trailing zeros are forbidden.
 - Every acceptance criterion has fresh evidence before technical passage.
+- Blockers, failed dependencies, scope changes, and consequential decisions stop
+  automatic advancement unless the confirmed policy explicitly covers them.
 - Installer changes preserve user content and avoid known partial-state failures.
