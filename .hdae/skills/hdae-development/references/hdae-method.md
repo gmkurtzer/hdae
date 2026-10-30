@@ -197,6 +197,14 @@ persist:
 - progress checkpoints, risks, decisions, and scope changes; and
 - the current next action.
 
+The human is the authority for ambiguous direction. If goals, gate boundaries,
+scope, priorities, acceptance criteria, expected results, or the meaning of
+observed results are unclear, incomplete, or conflicting, ask a focused
+question and wait before continuing affected work. State the known facts, the
+specific uncertainty, and why the answer matters. Do not silently choose a
+plausible interpretation; continue only unrelated work that cannot constrain
+the human's answer.
+
 Before starting a long execution loop, tell the human what will run, its scope,
 and when progress will be reported. Give an ETA range and confidence only when
 there is enough evidence. Otherwise state the uncertainty and the checkpoint
@@ -368,7 +376,8 @@ check, not permission to expand the user's goal.
 
 At gate completion, repeat the coverage review against the approved scope and
 show evidence for every acceptance criterion. Missing or unverified work keeps
-the gate partial.
+the gate partial. Ambiguous evidence or disagreement about what the result
+means requires user guidance; it is not evidence of passage.
 
 ## Multi-gate batches and checkpoint policy
 

@@ -86,6 +86,17 @@ When the boundary is uncertain, ask the human whether to use an HDAE gate for
 iteration and review before creating one. Once a gate is chosen, complete gate
 alignment and review it with the human as required below.
 
+## Ask the user when direction is unclear
+
+The user supplies authoritative guidance. Whenever a goal, gate boundary,
+scope, priority, acceptance criterion, expected result, or interpretation of
+observed results is unclear, incomplete, conflicting, or materially ambiguous,
+ask the user a focused question instead of assuming an answer. State what is
+known, what remains unclear, and why the answer affects the work. Wait for the
+user before continuing any affected implementation, verification, acceptance,
+or gate transition; only unrelated work that cannot prejudge the answer may
+continue.
+
 ## Converge without spinning
 
 Continue the autonomous inner loop while the approved request or gate is
@@ -280,6 +291,10 @@ review must not replace a check that can reasonably be automated.
 When the human adds or changes a requirement, update the affected gate map and
 acceptance criteria. If the change is material, obtain approval before
 continuing implementation.
+
+If any gate, goal, criterion, expected result, or observed outcome is unclear at
+alignment or later execution, stop the affected work and ask the user for
+guidance. Never silently resolve that ambiguity through an assumption.
 
 ## Persist shared understanding
 

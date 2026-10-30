@@ -43,6 +43,9 @@ must not duplicate those facts in identifiers, ordering fields, or gate indexes.
 - Every acceptance criterion has fresh evidence before technical passage.
 - Blockers, failed dependencies, scope changes, and consequential decisions stop
   automatic advancement unless the confirmed policy explicitly covers them.
+- Ambiguity about goals, gate boundaries, criteria, expected results, or the
+  meaning of evidence returns to the user for guidance rather than being
+  resolved by agent assumption.
 - Installer changes preserve user content outside managed installation paths
   and avoid known partial-state failures.
 - Copy-install updates run the current canonical installer from outside the
