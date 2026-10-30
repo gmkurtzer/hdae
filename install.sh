@@ -15,8 +15,6 @@ TARGET=
 INSTALL_CODEX=0
 INSTALL_CLAUDE=0
 MODE=copy
-VERSION=
-UPDATE=0
 UNINSTALL=0
 FORCE=0
 TEMP_DIR=
@@ -36,8 +34,6 @@ Install HDAE Agent Skills into a project.
   --copy              Copy skills into the target project (default)
   --link              Link agents directly to this HDAE checkout
   --target DIRECTORY  Select the target project (default: Git root or cwd)
-  --update            Fetch HDAE and replace an installer-managed copy
-  --version REF       Git tag, branch, or commit used with --update
   --uninstall         Remove an installer-managed HDAE installation
   --force             Replace locally modified installed skills
   --help              Show this help
@@ -189,7 +185,9 @@ for argument in "$@"; do
         --claude) INSTALL_CLAUDE=1 ;;
         --copy) MODE=copy ;;
         --link) MODE='link' ;;
-        --update) UPDATE=1 ;;
+        --update|--version)
+            die "updates use the current main installer: curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | sh"
+            ;;
         --uninstall) UNINSTALL=1 ;;
         --force) FORCE=1 ;;
         --help|-h) usage; exit 0 ;;
@@ -203,12 +201,7 @@ while [ "$#" -gt 0 ]; do
             TARGET=$2
             shift 2
             ;;
-        --version)
-            [ "$#" -ge 2 ] || die "--version requires a Git reference"
-            VERSION=$2
-            shift 2
-            ;;
-        --all|--codex|--claude|--copy|--link|--update|--uninstall|--force)
+        --all|--codex|--claude|--copy|--link|--uninstall|--force)
             shift
             ;;
         --help|-h)
@@ -220,14 +213,6 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-if [ -n "$VERSION" ]; then
-    UPDATE=1
-fi
-
-if [ "$MODE" = link ] && [ "$UPDATE" -eq 1 ]; then
-    die "--link cannot be combined with --update or --version; update the checkout separately"
-fi
-
 if [ -z "$TARGET" ]; then
     TARGET=$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)
 fi
@@ -236,6 +221,11 @@ fi
 TARGET=$(absolute_dir "$TARGET")
 HDAE_DIR=$TARGET/.hdae
 MANIFEST=$HDAE_DIR/manifest
+RECORDED_INSTALLER_COPY=$(manifest_value installer_copy "$MANIFEST" || true)
+LEGACY_INSTALLER_MANAGED=0
+if [ -f "$MANIFEST" ] && [ "$RECORDED_INSTALLER_COPY" != 0 ] && [ -f "$HDAE_DIR/install.sh" ]; then
+    LEGACY_INSTALLER_MANAGED=1
+fi
 
 if [ "$UNINSTALL" -eq 1 ]; then
     [ -f "$MANIFEST" ] || die "no installer-managed HDAE copy found in $TARGET"
@@ -256,7 +246,10 @@ if [ "$UNINSTALL" -eq 1 ]; then
         remove_agents_bootstrap
     fi
     rm -rf "$HDAE_DIR/skills"
-    rm -f "$HDAE_DIR/install.sh" "$HDAE_DIR/VERSION" "$MANIFEST"
+    if [ "$RECORDED_INSTALLER_COPY" != 0 ]; then
+        rm -f "$HDAE_DIR/install.sh"
+    fi
+    rm -f "$HDAE_DIR/VERSION" "$MANIFEST"
     rmdir "$HDAE_DIR" 2>/dev/null || true
     printf 'Removed installer-managed HDAE skills from %s\n' "$TARGET"
     exit 0
@@ -288,16 +281,15 @@ else
     SOURCE_LABEL=$SCRIPT_DIR
 fi
 
-if [ "$UPDATE" -eq 1 ] || [ -z "$SOURCE_ROOT" ] || [ ! -d "$SOURCE_ROOT/skills/hdae-development" ]; then
+if [ -z "$SOURCE_ROOT" ] || [ ! -d "$SOURCE_ROOT/skills/hdae-development" ]; then
     command -v git >/dev/null 2>&1 || die "git is required to fetch HDAE"
     TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/hdae.XXXXXX")
-    ref=${VERSION:-main}
-    if ! git clone --quiet --depth 1 --branch "$ref" "$REPOSITORY_URL" "$TEMP_DIR/source" 2>/dev/null; then
+    if ! git clone --quiet --depth 1 --branch main "$REPOSITORY_URL" "$TEMP_DIR/source" 2>/dev/null; then
         git clone --quiet "$REPOSITORY_URL" "$TEMP_DIR/source"
-        (cd "$TEMP_DIR/source" && git checkout --quiet "$ref") || die "cannot resolve HDAE version: $ref"
+        (cd "$TEMP_DIR/source" && git checkout --quiet main) || die "cannot resolve HDAE main branch"
     fi
     SOURCE_ROOT=$TEMP_DIR/source
-    SOURCE_LABEL=$REPOSITORY_URL@$ref
+    SOURCE_LABEL=$REPOSITORY_URL@main
 fi
 
 for skill in hdae-development pr-issue-review; do
@@ -312,10 +304,10 @@ if [ "$MODE" = link ]; then
             ;;
     esac
     SKILLS_ROOT=$SOURCE_ROOT/skills
-    INSTALLED_VERSION=${VERSION:-$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')}
+    INSTALLED_VERSION=$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')
 else
     SKILLS_ROOT=$HDAE_DIR/skills
-    INSTALLED_VERSION=${VERSION:-$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')}
+    INSTALLED_VERSION=$(sed -n '1p' "$SOURCE_ROOT/VERSION" 2>/dev/null || printf 'development')
 fi
 
 desired_link() {
@@ -371,9 +363,8 @@ if [ "$MODE" = copy ]; then
     cp -R "$SOURCE_ROOT/skills/pr-issue-review" "$stage/"
     rm -rf "$HDAE_DIR/skills"
     mv "$stage" "$HDAE_DIR/skills"
-    if [ "$SOURCE_ROOT/install.sh" != "$HDAE_DIR/install.sh" ]; then
-        cp "$SOURCE_ROOT/install.sh" "$HDAE_DIR/install.sh"
-        chmod +x "$HDAE_DIR/install.sh"
+    if [ "$LEGACY_INSTALLER_MANAGED" -eq 1 ]; then
+        rm -f "$HDAE_DIR/install.sh"
     fi
     if [ -f "$SOURCE_ROOT/VERSION" ] && [ "$SOURCE_ROOT/VERSION" != "$HDAE_DIR/VERSION" ]; then
         cp "$SOURCE_ROOT/VERSION" "$HDAE_DIR/VERSION"
@@ -416,6 +407,7 @@ if [ "$MODE" = copy ]; then
 version=$INSTALLED_VERSION
 source=$SOURCE_LABEL
 mode=copy
+installer_copy=0
 skills_digest=$digest
 agents_bootstrap=$BOOTSTRAP_MANAGED
 agents_bootstrap_digest=$(print_agents_bootstrap | sha256_stream)

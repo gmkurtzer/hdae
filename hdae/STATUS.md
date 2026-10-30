@@ -3,11 +3,11 @@
 - Active skill: `hdae-development`
 - Skill path: `.agents/skills/hdae-development/SKILL.md`
 - Reload after context shift: required
-- Active gate: none
-- Current state: all defined gates are closed; todo is empty
-- Last evidence: the live Gates 3–6 batch passed fresh validators, artifact and
-  installer comparisons, integration and ledger tests, completeness review, and
-  commit checks; delegated gates advanced in order to the Gate 6 checkpoint
+- Active gate: `hdae/gates-todo/7-external-update-installer.md`
+- Current state: technically passed; checkpoint review pending
+- Last evidence: Gate 7 passed skill validation, copy synchronization,
+  curl-to-shell update, legacy migration, user-file preservation, deprecation,
+  link, uninstall, full integration, completeness, and diff checks
 - Open decisions or limitations: none
-- Exact next action: await new human direction; the next appended gate position
-  is `7`
+- Exact next action: human review of Gate 7; acceptance moves it to
+  `gates-done/`, while rejection or correction keeps it open

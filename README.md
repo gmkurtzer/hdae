@@ -53,7 +53,7 @@ curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
 
 The installer copies the canonical skills into `.hdae/skills/`, records their
 source and checksum in `.hdae/manifest`, and creates Git-compatible relative
-discovery links:
+discovery links. It does not copy itself into the target project:
 
 ```text
 .agents/skills/<name> -> ../../.hdae/skills/<name>  # Codex
@@ -140,19 +140,16 @@ Copy the complete directory, including `SKILL.md`, `agents/`, and
 ./install.sh --claude --copy         Install for Claude Code only
 ./install.sh --all --link            Link to this HDAE checkout
 ./install.sh --target /path/project  Select the target repository
-./install.sh --update --version TAG  Fetch and install a tagged version
 ./install.sh --uninstall             Remove an installer-managed copy
 ```
 
-`--update` downloads from `https://github.com/gmkurtzer/hdae.git`. Local
-changes are detected using the recorded skill checksum and block replacement
-unless `--force` is supplied. Checksums include regular-file content and
-symlink targets and are portable across the supported SHA-256 tools. Link mode
-always uses the current checkout, so `--link` cannot be combined with `--update`
-or `--version`. The managed `AGENTS.md` recovery block is installed only for
-Codex copy installations; development-link and manual-copy users should add an
-equivalent repository instruction when compaction recovery is required. The
-installer never runs project code.
+Local changes are detected using the recorded skill checksum and block
+replacement unless `--force` is supplied. Checksums include regular-file
+content and symlink targets and are portable across the supported SHA-256
+tools. The managed `AGENTS.md` recovery block is installed only for Codex copy
+installations; development-link and manual-copy users should add an equivalent
+repository instruction when compaction recovery is required. The installer
+never runs project code and never installs itself into a managed copy.
 
 ## Use HDAE
 
@@ -215,12 +212,17 @@ authorization.
 From an installed project:
 
 ```sh
-./.hdae/install.sh --update --version v0.2.0 --all
+curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
+    sh -s -- --target . --all --copy
 ```
 
-Review the skill changes like any other dependency update before committing
-them. For an installation cloned directly into `.hdae`, update the checkout
-with Git and rerun `./.hdae/install.sh --all --link`.
+Use `--codex` or `--claude` instead of `--all` when only one discovery target
+is configured. The HDAE development skill knows this procedure and can perform
+it when directed. Review skill changes like any other dependency update before
+committing them. The installer is fetched for each update and is not stored in
+the target project. For a development checkout cloned directly into `.hdae`,
+update that checkout with Git and rerun its source
+`./.hdae/install.sh --all --link`.
 
 ## Project status
 

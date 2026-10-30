@@ -20,21 +20,28 @@ cat >"$PROJECT/AGENTS.md" <<'EOF'
 Keep this user-authored instruction.
 EOF
 
-# Incompatible update and link modes must fail before changing the target.
-UPDATE_LINK_PROJECT=$TEST_ROOT/update-link-project
-mkdir -p "$UPDATE_LINK_PROJECT"
-git -C "$UPDATE_LINK_PROJECT" init -q
-if HDAE_REPOSITORY_URL=$REPOSITORY_ROOT \
-    "$REPOSITORY_ROOT/install.sh" --target "$UPDATE_LINK_PROJECT" --all --update --link \
-    >"$TEST_ROOT/update-link.out" 2>&1; then
-    echo 'update and link modes were accepted together' >&2
+# Deprecated installed-updater options must fail before changing the target and
+# direct users to the external main-branch installer.
+DEPRECATED_PROJECT=$TEST_ROOT/deprecated-project
+mkdir -p "$DEPRECATED_PROJECT"
+git -C "$DEPRECATED_PROJECT" init -q
+if "$REPOSITORY_ROOT/install.sh" --target "$DEPRECATED_PROJECT" --all --update \
+    >"$TEST_ROOT/deprecated-update.out" 2>&1; then
+    echo 'deprecated update mode was accepted' >&2
     exit 1
 fi
-grep -q -- '--link cannot be combined with --update or --version' \
-    "$TEST_ROOT/update-link.out"
-test ! -e "$UPDATE_LINK_PROJECT/.hdae"
-test ! -e "$UPDATE_LINK_PROJECT/.agents"
-test ! -e "$UPDATE_LINK_PROJECT/.claude"
+grep -q 'updates use the current main installer: curl -fsSL' \
+    "$TEST_ROOT/deprecated-update.out"
+if "$REPOSITORY_ROOT/install.sh" --target "$DEPRECATED_PROJECT" --all \
+    --version v0.1.1 >"$TEST_ROOT/deprecated-version.out" 2>&1; then
+    echo 'deprecated version mode was accepted' >&2
+    exit 1
+fi
+grep -q 'updates use the current main installer: curl -fsSL' \
+    "$TEST_ROOT/deprecated-version.out"
+test ! -e "$DEPRECATED_PROJECT/.hdae"
+test ! -e "$DEPRECATED_PROJECT/.agents"
+test ! -e "$DEPRECATED_PROJECT/.claude"
 
 # Discovery conflicts must be detected before any installation state changes.
 CONFLICT_PROJECT=$TEST_ROOT/conflict-project
@@ -98,19 +105,31 @@ HDAE_REPOSITORY_URL=$STDIN_SOURCE sh -s -- --target "$STDIN_PROJECT" --all --cop
 test -f "$STDIN_PROJECT/.hdae/manifest"
 test -f "$STDIN_PROJECT/.agents/skills/hdae-development/SKILL.md"
 test -f "$STDIN_PROJECT/.claude/skills/pr-issue-review/SKILL.md"
+test ! -e "$STDIN_PROJECT/.hdae/install.sh"
+grep -q '^installer_copy=0$' "$STDIN_PROJECT/.hdae/manifest"
 grep -q "source=$STDIN_SOURCE@main" "$STDIN_PROJECT/.hdae/manifest"
-"$STDIN_PROJECT/.hdae/install.sh" --target "$STDIN_PROJECT" --all --copy \
-    >"$TEST_ROOT/stdin-reinstall.out"
+printf '\nupdate marker\n' \
+    >>"$STDIN_SOURCE/skills/hdae-development/references/hdae-method.md"
+git -C "$STDIN_SOURCE" add skills/hdae-development/references/hdae-method.md
+git -C "$STDIN_SOURCE" -c user.name=HDAE -c user.email=hdae@example.invalid \
+    commit -q -m 'test update'
+HDAE_REPOSITORY_URL=$STDIN_SOURCE sh -s -- --target "$STDIN_PROJECT" --all --copy \
+    <"$REPOSITORY_ROOT/install.sh" >"$TEST_ROOT/stdin-update.out"
+grep -q 'update marker' \
+    "$STDIN_PROJECT/.hdae/skills/hdae-development/references/hdae-method.md"
+test ! -e "$STDIN_PROJECT/.hdae/install.sh"
 
 "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy
 
 test -f "$PROJECT/.hdae/manifest"
 test -f "$PROJECT/.hdae/skills/hdae-development/SKILL.md"
 test -f "$PROJECT/.hdae/skills/pr-issue-review/SKILL.md"
+test ! -e "$PROJECT/.hdae/install.sh"
 test -L "$PROJECT/.agents/skills/hdae-development"
 test -L "$PROJECT/.claude/skills/pr-issue-review"
 test -f "$PROJECT/.agents/skills/hdae-development/SKILL.md"
 grep -q '^agents_bootstrap=1$' "$PROJECT/.hdae/manifest"
+grep -q '^installer_copy=0$' "$PROJECT/.hdae/manifest"
 grep -q '^# Project instructions$' "$PROJECT/AGENTS.md"
 grep -q '^Keep this user-authored instruction\.$' "$PROJECT/AGENTS.md"
 test "$(grep -Fxc '<!-- hdae:context-recovery:start -->' "$PROJECT/AGENTS.md")" -eq 1
@@ -120,9 +139,40 @@ test "$(grep -Fxc '<!-- hdae:context-recovery:end -->' "$PROJECT/AGENTS.md")" -e
 "$REPOSITORY_ROOT/install.sh" --target "$PROJECT" --all --copy
 test "$(grep -Fxc '<!-- hdae:context-recovery:start -->' "$PROJECT/AGENTS.md")" -eq 1
 
-# The installed entry point must also support an idempotent local reinstall.
-"$PROJECT/.hdae/install.sh" --target "$PROJECT" --all --copy
-grep -q '^version=0.1.1$' "$PROJECT/.hdae/manifest"
+# An old manifest identifies the historical self-copy as installer-managed. A
+# new external reinstall removes it and records that future files are unowned.
+LEGACY_PROJECT=$TEST_ROOT/legacy-project
+mkdir -p "$LEGACY_PROJECT"
+git -C "$LEGACY_PROJECT" init -q
+"$REPOSITORY_ROOT/install.sh" --target "$LEGACY_PROJECT" --codex --copy \
+    >"$TEST_ROOT/legacy-initial.out"
+sed '/^installer_copy=0$/d' "$LEGACY_PROJECT/.hdae/manifest" \
+    >"$TEST_ROOT/legacy-manifest"
+cp "$TEST_ROOT/legacy-manifest" "$LEGACY_PROJECT/.hdae/manifest"
+cp "$REPOSITORY_ROOT/install.sh" "$LEGACY_PROJECT/.hdae/install.sh"
+"$REPOSITORY_ROOT/install.sh" --target "$LEGACY_PROJECT" --codex --copy \
+    >"$TEST_ROOT/legacy-migrate.out"
+test ! -e "$LEGACY_PROJECT/.hdae/install.sh"
+grep -q '^installer_copy=0$' "$LEGACY_PROJECT/.hdae/manifest"
+
+# A user-created file at the former path remains untouched once the manifest
+# records that HDAE no longer owns an installer copy, including on uninstall.
+PRESERVE_PROJECT=$TEST_ROOT/preserve-project
+mkdir -p "$PRESERVE_PROJECT/.hdae"
+git -C "$PRESERVE_PROJECT" init -q
+printf '%s\n' '# user-owned file' >"$PRESERVE_PROJECT/.hdae/install.sh"
+cp "$PRESERVE_PROJECT/.hdae/install.sh" "$TEST_ROOT/user-install.sh"
+"$REPOSITORY_ROOT/install.sh" --target "$PRESERVE_PROJECT" --codex --copy \
+    >"$TEST_ROOT/preserve-initial.out"
+cmp -s "$TEST_ROOT/user-install.sh" "$PRESERVE_PROJECT/.hdae/install.sh"
+"$REPOSITORY_ROOT/install.sh" --target "$PRESERVE_PROJECT" --codex --copy \
+    >"$TEST_ROOT/preserve-reinstall.out"
+cmp -s "$TEST_ROOT/user-install.sh" "$PRESERVE_PROJECT/.hdae/install.sh"
+"$REPOSITORY_ROOT/install.sh" --target "$PRESERVE_PROJECT" --uninstall \
+    >"$TEST_ROOT/preserve-uninstall.out"
+cmp -s "$TEST_ROOT/user-install.sh" "$PRESERVE_PROJECT/.hdae/install.sh"
+test ! -e "$PRESERVE_PROJECT/.hdae/manifest"
+test ! -e "$PRESERVE_PROJECT/.hdae/skills"
 
 # Local changes inside the installer-managed bootstrap must be protected.
 cp "$PROJECT/AGENTS.md" "$TEST_ROOT/agents-managed"

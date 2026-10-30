@@ -122,6 +122,31 @@ procedure and shell commands in
 [references/hdae-method.md](references/hdae-method.md) before creating,
 inserting, selecting, deferring, completing, or migrating gates.
 
+## Update an installed HDAE copy
+
+When the human asks to update a copied HDAE installation, run the current
+canonical installer from GitHub `main`; never execute or expect
+`.hdae/install.sh`, and do not add Python. Determine the project root and
+preserve its existing discovery targets: use `--codex` when only `.agents`
+HDAE links exist, `--claude` when only `.claude` links exist, or `--all` when
+both exist. Then run, substituting that flag and the actual project root:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh |
+    sh -s -- --target "$project_root" --all --copy
+```
+
+The installer must stop on locally modified managed skills or recovery
+instructions. Do not add `--force` without explicit human authorization after
+showing what would be replaced. Afterward, verify the configured discovery
+links, `.hdae/manifest`, and skill contents; confirm the installer did not leave
+a managed `.hdae/install.sh`; if a manifest already declared
+`installer_copy=0` and a file existed there, confirm that user-owned file stayed
+unchanged. Review the dependency diff and commit only when authorized by
+repository practice. A development-link installation is a source checkout
+rather than a managed copy: update that checkout with Git and rerun its source
+`install.sh --link` instead of using this copy-update command.
+
 ## Align batches and checkpoints
 
 When the human requests several gates, a range, or all todo gates, inspect them

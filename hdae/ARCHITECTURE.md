@@ -5,7 +5,8 @@
 - `skills/` contains the canonical skill sources.
 - `.hdae/skills/` contains installer-managed copies.
 - `.agents/skills/` and `.claude/skills/` expose discovery links.
-- `install.sh` is canonical; `.hdae/install.sh` is its installed copy.
+- `install.sh` is the external canonical installer and is never copied into a
+  managed project installation.
 
 Canonical and installed copies must be reconciled before a gate passes.
 
@@ -36,3 +37,5 @@ must not duplicate those facts in identifiers, ordering fields, or gate indexes.
 - Blockers, failed dependencies, scope changes, and consequential decisions stop
   automatic advancement unless the confirmed policy explicitly covers them.
 - Installer changes preserve user content and avoid known partial-state failures.
+- Copy-install updates run the current canonical installer from outside the
+  target, normally through the documented GitHub `main` shell pipe.
