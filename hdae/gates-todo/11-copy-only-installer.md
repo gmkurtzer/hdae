@@ -46,6 +46,7 @@ installer-copy metadata.
 - Running `install.sh` directly from a separate checkout still copy-installs
   both skills and all supported discovery links.
 - README and HDAE skills describe only the copy-based workflow.
+- README provides both shell and natural-language agent installation commands.
 - Installer regression tests, skill validation, canonical/installed comparison,
   `make check`, and `git diff --check` pass.
 
@@ -66,6 +67,7 @@ installer-copy metadata.
 - Final `make check`: passed shell syntax, ShellCheck, and installer integration
   tests.
 - Final `git diff --check`: passed.
+- README agent-install prompt: added and verified alongside the shell command.
 - Coverage: installation, rejection of removed mode, legacy migration, update,
   uninstall, agent discovery, documentation, and skill synchronization passed;
   security, privacy, performance, and deployment changes were not applicable.
@@ -83,8 +85,9 @@ installer-copy metadata.
 - Pull request: not intended.
 - Planned commits: copy-only installer and regression tests; documentation,
   synchronized skills, and final gate evidence.
-- Actual commits: `0a7816d` (copy-only installer and regression tests); this
-  commit (documentation, synchronized skills, and final evidence).
+- Actual commits: `0a7816d` (copy-only installer and regression tests);
+  `70e9626` (documentation, synchronized skills, and final evidence); this
+  commit (natural-language agent installation prompt).
 
 ## Review policy and outcome
 

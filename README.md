@@ -63,6 +63,13 @@ curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
     sh -s -- --copy --target /path/to/project
 ```
 
+You can also ask a coding agent to perform the installation from the project
+that should use HDAE:
+
+```text
+Install the HDAE skills into this project from https://github.com/gmkurtzer/hdae
+```
+
 The installer copies the canonical skills into `.hdae/skills/`, records their
 source and checksum in `.hdae/manifest`, and creates Git-compatible relative
 discovery links. It does not copy itself into the target project:
