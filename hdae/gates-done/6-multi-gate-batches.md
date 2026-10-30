@@ -39,7 +39,7 @@ human pauses while preserving deliberate checkpoints for decisions and risk.
 
 ## Remaining work
 
-- [ ] Obtain review under this gate's current checkpoint requirement.
+None.
 
 ## Acceptance criteria
 
@@ -76,6 +76,5 @@ human pauses while preserving deliberate checkpoints for decisions and risk.
 
 ## Review policy and outcome
 
-Checkpoint confirmed for the Gates 3–6 batch. Implementation, technical
-passage, and the live batch test are recorded; final human review remains
-pending. The live test exposed no skill defect requiring another update.
+The human accepted this checkpoint after the live Gates 3–6 batch test. The
+gate is closed; the test exposed no skill defect requiring another update.
