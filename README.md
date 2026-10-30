@@ -221,6 +221,12 @@ curl -fsSL https://raw.githubusercontent.com/gmkurtzer/hdae/main/install.sh | \
     sh -s -- --target . --all --copy
 ```
 
+Or ask a coding agent from the installed project:
+
+```text
+Update the HDAE skills in this project from https://github.com/gmkurtzer/hdae
+```
+
 Use `--codex` or `--claude` instead of `--all` when only one discovery target
 was configured by an older HDAE version; these compatibility aliases now repair
 and configure both supported discovery roots. The HDAE development skill knows
