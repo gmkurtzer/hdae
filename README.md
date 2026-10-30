@@ -74,8 +74,8 @@ The installer copies the canonical skills into `.hdae/skills/`, records their
 source and checksum in `.hdae/manifest`, and creates Git-compatible relative
 discovery links. For each skill, it creates links at:
 
-- `.agents/skills/<name>` for Codex
-- `.claude/skills/<name>` for Claude Code
+- `.agents/skills/<skill>` for Codex
+- `.claude/skills/<skill>` for Claude Code
 
 It does not copy itself into the target project.
 
