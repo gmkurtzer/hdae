@@ -144,7 +144,10 @@ Keep completed work, remaining work, criteria, verification plan, evidence,
 decisions, limitations, and review policy in that gate file. A technically
 passed gate remains in `gates-todo/` until it reaches its confirmed review
 boundary: explicit human acceptance for a checkpoint gate or automatic closure
-for a delegated gate.
+for a delegated gate. Every file in `gates-done/` is a locked historical
+record: never edit, rename, reorder, or delete it. If later work is needed,
+create a new gate. Only an explicit human direction may reopen a closed gate;
+move the unchanged file to `gates-todo/` before making any modification.
 Move a gate to `gates-deferred/` only with the reason and return condition
 recorded; move it back to `gates-todo/` when reactivated. Read the gate-ledger
 procedure and shell commands in

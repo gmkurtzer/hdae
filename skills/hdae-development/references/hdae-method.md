@@ -81,13 +81,19 @@ The path is authoritative metadata:
 - `gates-deferred/` means the human intentionally postponed it and the file
   records why and what should cause reconsideration.
 
+Files in `gates-done/` are locked historical records. Never edit, rename,
+reorder, or delete them. A correction, regression, or follow-up discovered
+after closure belongs in a new gate. A closed gate may be reopened only at the
+human's explicit direction: first move its unchanged file from `gates-done/` to
+`gates-todo/`, then record and perform the newly approved work there.
+
 The filename is `<decimal-position>-<short-slug>.md`. Use integers for ordinary
 appends and a decimal midpoint for insertion. For example, insert `1.5-auth.md`
 between `1-foundation.md` and `2-api.md`; further insertions may use `1.25` or
 `1.75`. Use only digits and one decimal point, remove unnecessary trailing
 zeros, and never reuse a position. Do not add `id`, lifecycle, or order fields
-that repeat the path. If an existing gate must be reordered, rename only that
-gate.
+that repeat the path. If an open or deferred gate must be reordered, rename
+only that gate; never reorder a closed gate.
 
 Run these commands from the repository root. List every gate in execution order:
 
@@ -126,7 +132,9 @@ alone leaves a gate in `gates-todo/`. Move it to `gates-done/` only after human
 acceptance at a checkpoint or automatic closure authorized by the confirmed
 batch policy. Move it to `gates-deferred/` only after explicit deferral,
 retaining the same filename, and return it to `gates-todo/` when the recorded
-condition is met.
+condition is met. Never use insertion or reordering as a reason to rename a
+locked gate in `gates-done/`; decimal positions allow new gates to be inserted
+without modifying closed records.
 
 The gate body owns substantive information, not routing metadata:
 
