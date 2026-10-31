@@ -36,8 +36,10 @@ must use Review now; it must not create another schedule.
    convention, and whether outstanding attention items should repeat until
    acknowledged. Separately ask whether the task may run isolated PR validation
    and post non-binding PR feedback or ordinary issue responses. For actionable
-   engineering issues, ask whether the task may create HDAE gates, which branch
-   strategy those gates use, and whether their execution is also authorized.
+   engineering issues, ask whether the task may create HDAE gates, which base
+   branch to use when it differs from the repository default, and whether gate
+   execution is also authorized. Issue- and PR-originated work always uses a
+   dedicated branch intended for a new pull request.
    Recommend repetition until acknowledgment and default validation, external
    actions, gate creation, and gate execution to read-only or unapproved.
 4. Perform one bounded read-only review to prove access and preview the output.
@@ -117,7 +119,10 @@ When the saved gate policy authorizes creation, use `$hdae-development` in
 Maintain mode to create the smallest gate in `hdae/gates-todo/`. Trace it to the
 issue and record the goal, scope and non-goals, dependencies, deterministic
 acceptance evidence, delivery strategy, review policy, and exact next action.
-Follow the saved branch policy and ask the user when the issue leaves any gate
+Create a dedicated branch intended for a new pull request and record the source
+issue or PR in the gate; never offer the current branch for this work. The new
+pull request must reference the source item, using a closing keyword only when
+authorized and fully resolved. Ask the user when the issue leaves any gate
 boundary or result materially unclear. If creation is not authorized, present
 the proposed gate and request permission instead of writing it.
 

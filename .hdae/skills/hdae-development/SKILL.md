@@ -246,6 +246,14 @@ the choice in the gate file before implementation, including the working
 branch, intended base branch when relevant, and whether a pull request is
 intended.
 
+Work originating from an issue or pull-request review is an exception: always
+create a dedicated branch intended for a new pull request, and do not offer the
+current branch as an option. Record the originating issue or pull request in the
+gate and reference it in the new pull request. Use a closing keyword only when
+the work fully resolves an issue and the human's policy permits closure;
+otherwise use a non-closing reference. This delivery rule does not by itself
+authorize pushing the branch or opening the pull request.
+
 Plan commits as part of the gate. A gate is large when it contains multiple
 independently reviewable changes, components, migrations, or risk boundaries.
 Use multiple coherent commits for such a gate so each commit has one clear

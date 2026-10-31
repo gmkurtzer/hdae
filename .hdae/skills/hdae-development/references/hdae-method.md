@@ -141,6 +141,9 @@ The gate body owns substantive information, not routing metadata:
 ```markdown
 # <Gate name>
 
+## Source
+<Originating issue or pull request when applicable; otherwise not applicable.>
+
 ## Goal
 <Observable outcome.>
 
@@ -369,6 +372,11 @@ reopens it under the locked-gate procedure.
 Every newly created gate records how its work will be delivered. Ask the human
 whether the gate should use the current branch or a dedicated branch intended
 for a pull request, unless an explicit choice already covers that exact gate.
+Do not ask this question for work originating from issue or pull-request review:
+it always uses a dedicated branch intended for a new pull request. Record the
+source item in the gate and reference it in the pull request. Use a closing
+keyword only when the work fully resolves an issue and closure is authorized;
+otherwise use a non-closing reference.
 Record:
 
 - working branch and intended base branch when relevant;
