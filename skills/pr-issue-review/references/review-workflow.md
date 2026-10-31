@@ -168,6 +168,10 @@ outside the saved scope or risk policy, destructive or irreversible impact,
 conflicting evidence that changes the intended result, or failed verification
 with no credible safe in-scope path. Gate numbering, dedicated-branch creation,
 routine commit planning, and deterministic test selection are not blockers.
+Before stopping execution, create and persist a safe gate whenever possible. A
+private security gate must contain only a sanitized reference and checkpoint,
+never confidential details; stop before writing if even that would disclose the
+finding.
 
 For each material issue, outstanding issue, or open-PR finding report its
 identifier, kind,

@@ -152,6 +152,13 @@ dedicated-branch creation, routine commit planning, and deterministic test
 selection are not blockers. Never promise future work unless it has actually
 been authorized and queued or started.
 
+Under a proactive gate policy, create and persist a safe gate before stopping
+for an execution blocker whenever possible. For a private security finding,
+record only a sanitized reference and checkpoint; never copy confidential
+details into a public repository or public discussion. If even a sanitized gate
+would disclose the finding, stop before writing it and explain that limitation
+privately.
+
 ## External actions
 
 Default all review runs to analysis and drafts. During setup, the user may grant

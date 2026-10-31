@@ -330,7 +330,11 @@ destructive or irreversible impact, conflicting evidence that changes the
 intended result, or failed verification with no credible safe in-scope path.
 Gate numbering, the required dedicated branch, routine commit planning, and
 deterministic test selection are not blockers. Report and ask one focused
-question only when a blocker actually requires human direction.
+question only when a blocker actually requires human direction. When safe,
+persist the gate and blocker before stopping so the work is not lost. Do not
+write confidential vulnerability details to a public repository; use a
+sanitized gate reference or stop before writing when even that would disclose
+the issue.
 
 When creating or revising a gate, maximize deterministic verification. Map
 every acceptance criterion to an automated test, command, or reproducible

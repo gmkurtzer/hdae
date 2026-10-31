@@ -416,6 +416,9 @@ security or privacy risk, missing permission or credentials, scope outside the
 policy, destructive or irreversible impact, materially conflicting evidence,
 or failed verification with no credible safe in-scope path. Routine gate,
 branch, commit, and deterministic-test choices are not blockers.
+When safe, persist the gate and blocker before stopping. For private security
+findings, record only a sanitized reference and checkpoint; never put
+confidential vulnerability details in a public repository.
 
 The coverage review considers each relevant surface:
 
