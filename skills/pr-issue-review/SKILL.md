@@ -40,12 +40,12 @@ must use Review now; it must not create another schedule.
    and which base branch to use when it differs from the repository default.
    Issue- and PR-originated work always uses a dedicated branch intended for a
    new pull request. Automatic remediation includes signed commits, pushing
-   that dedicated branch, opening or updating its pull request, and linking the
-   source discussion and pull request to each other; do not split those routine
-   delivery steps into separate permission questions. Recommend
-   repetition until
-   acknowledgment and recommend automatic creation, execution, validation, and
-   PR delivery for objective work within a narrowly recorded policy. Require the
+   that dedicated branch, opening or updating a pull request containing the
+   verified corrective deliverable, and linking the source discussion and pull
+   request to each other; do not split those routine delivery steps into
+   separate permission questions. Recommend repetition until acknowledgment and
+   recommend automatic creation, execution, validation, and PR delivery for
+   objective work within a narrowly recorded policy. Require the
    user to confirm that standing delegation once during setup; default anything
    outside it to read-only or unapproved.
    If the setup request itself explicitly asks for automatic or proactive
@@ -140,15 +140,20 @@ issue or PR in the gate; never offer the current branch for this work. Name it
 Reference the source item in the new pull request. After the pull request
 exists, ensure the relationship is explicit in both discussions: comment on the
 source issue or pull request with the new pull-request link, and comment on the
-new pull request with the source-item link. Do not rely only on the provider's
-automatic cross-reference, and do not duplicate an equivalent existing comment.
-Record both stable links in the gate. These reciprocal comments are routine
-delivery under an automatic-management or proactive-remediation policy. Use a
-closing keyword or close a source issue only when the saved
-automatic-management policy authorizes it; otherwise use a non-closing
-reference. Never close a pull request. Ask the user when the issue leaves any
-gate boundary or result materially unclear. If creation is not authorized,
-present the proposed gate and request permission instead of writing it.
+new pull request with the source-item link. Use one descriptive Markdown link
+per referenced item, such as `[PR #9](https://github.com/OWNER/REPO/pull/9)`;
+never repeat the same reference as a standalone URL or second number link. The
+source-item comment must briefly summarize the corrective change, gate,
+verification results, review status, and any remaining work. Do not rely only
+on the provider's automatic cross-reference, and do not duplicate an equivalent
+existing comment. Record both comment URLs in the gate. These reciprocal
+comments are routine delivery under an automatic-management or
+proactive-remediation policy. Use a closing keyword or close a source issue only
+when the saved automatic-management policy authorizes it; otherwise use a
+non-closing reference. Never close a pull request. Ask the user when the issue
+leaves any gate boundary or result materially unclear. If creation is not
+authorized, present the proposed gate and request permission instead of writing
+it.
 
 Partition work before implementation. Use one gate, one dedicated branch, and
 one pull request for each independently reviewable issue fix. Do not combine
@@ -157,25 +162,40 @@ same root cause or an inseparable change and verification set; create one gate
 for that combined work and record why separate delivery would be misleading or
 unsafe.
 
+An issue-remediation pull request must contain the actual corrective deliverable
+defined by its gate, not only an HDAE gate file, status update, plan, or evidence
+report. Before pushing or opening the pull request, inspect its complete diff
+against the intended base and map the changed product, test, configuration, or
+documentation artifacts to every gate deliverable and acceptance criterion.
+Control-plane files under `hdae/` may accompany the fix but cannot substitute
+for it, unless the source issue itself is specifically about that HDAE material.
+If investigation finds actionable residual defects, create and execute their
+corrective gates under the saved policy instead of presenting the investigation
+report as the fix. If evidence shows that no repository change is needed, do
+not open a remediation pull request; post the evidence and disposition to the
+source discussion.
+
 Gate creation does not by itself authorize implementation. When the saved policy
 delegates automatic execution, autonomously align and persist the gate, create
-its branch, implement and verify the bounded fix, make the planned signed
-commits, push the dedicated branch, and open or update the referencing pull
-request. Never push directly to the repository's default branch, including
-`main`, and never close or merge a pull request. Do not pause for routine
-approval of the derived gate, branch, criteria, plan, or checkpoint map. Tell
-the user what was created and whether
+its branch, implement and verify the bounded fix, confirm the branch diff
+contains that fix, make the planned signed commits, push the dedicated branch,
+and open or update the referencing pull request. Never push directly to the
+repository's default branch, including `main`, and never close or merge a pull
+request. Do not pause for routine approval of the derived gate, branch,
+criteria, plan, or checkpoint map. Tell the user what was created and whether
 execution or PR delivery is active or complete.
 
 Treat that sequence as one required loop: read and classify the source, create
 the gate, create its branch, execute and verify the gate, commit, push, open the
-pull request, add the reciprocal source-item and pull-request comments, record
-their stable URLs in the gate, and notify the user. Local branches and commits
-are intermediate state, not completion. A gate cannot move to `gates-done/`,
-and the run cannot report successful remediation, until its remote branch, open
-pull request, and reciprocal links exist. If delivery fails, keep the gate in
-`gates-todo/`, report **Review incomplete** with the exact failure, and retry
-when a credible in-policy recovery exists.
+pull request only after its base diff contains the corrective deliverable, add
+the concise reciprocal source-item and pull-request comments, record their
+stable URLs in the gate, and notify the user. Local branches, commits, gate
+records, and evidence reports are intermediate state, not completion. A gate
+cannot move to `gates-done/`, and the run cannot report successful remediation,
+until its verified fix, remote branch, open pull request, and reciprocal links
+exist. If delivery fails, keep the gate in `gates-todo/`, report **Review
+incomplete** with the exact failure, and retry when a credible in-policy
+recovery exists.
 
 Stop and ask one focused question only for a meaningful blocker: an ambiguous
 product or architecture decision, nonpublic security or privacy risk that
