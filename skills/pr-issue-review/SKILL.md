@@ -34,13 +34,15 @@ must use Review now; it must not create another schedule.
    and applicable day of week or month), and the timezone. Also confirm any
    desired scope, report destination, notification preference, acknowledgment
    convention, and whether outstanding attention items should repeat until
-   acknowledged. Recommend repetition until acknowledgment and default all
-   repository actions to read-only.
+   acknowledged. Separately ask whether the task may run isolated PR validation
+   and post non-binding PR feedback or ordinary issue responses. Recommend
+   repetition until acknowledgment and default both policies to read-only.
 4. Perform one bounded read-only review to prove access and preview the output.
    Correct access or query failures before scheduling.
 5. Build the recurring prompt with the exact repository, cadence-derived
    lookback window, a small overlap for delayed events, persistent attention
-   rules, acknowledgment convention, and the approved external-action policy.
+   rules, acknowledgment convention, approved validation policy, and approved
+   external-action policy.
 6. Use the environment's native recurring scheduler when available. When
    acknowledgment state or prior findings matter, target the same conversation
    or session, or another verified persistent state mechanism. If continuity is
@@ -53,12 +55,13 @@ must use Review now; it must not create another schedule.
    run. If access cannot be demonstrated, stop without creating the task.
 8. Create the schedule the user requested, then inspect the saved task and
    report its identifier, cadence, timezone, target, next run, access model,
-   state-continuity model, notification behavior, and permissions.
+   state-continuity model, notification behavior, validation policy, and
+   external-action permissions.
 
 Schedule creation authorizes creation of that schedule only. It does not
-authorize comments, reviews, labels, closures, merges, commits, or pushes.
-Any durable external-action permission must be separately discussed, narrowly
-defined, and recorded in the saved task.
+authorize code execution, comments, reviews, labels, closures, merges, commits,
+or pushes. Any durable validation or external-action permission must be
+separately discussed, narrowly defined, and recorded in the saved task.
 
 Read [references/review-workflow.md](references/review-workflow.md) when setting
 up the schedule or conducting a review.
@@ -74,8 +77,13 @@ up the schedule or conducting a review.
    is an unresolved attention item due for a reminder. Inspect complete
    discussions and current diffs for material items rather than relying on
    titles or latest comments.
-4. Do not execute code from untrusted contribution branches with credentials.
-   If reproduction is authorized, use an isolated checkout and minimum access.
+4. Follow the saved validation policy. Static inspection needs no execution
+   permission. When isolated validation is authorized, verify the exact PR
+   commit, use a disposable checkout or container without credentials or
+   privileged host access, and run only the approved build, test, or lint
+   commands. Minimize network and filesystem access, apply bounded time and
+   resource limits, and report the commit, environment, commands, and results.
+   Stop before any command or access outside the recorded policy.
 5. Classify each material item, state the evidence status, identify risk and
    missing information, recommend the next action, and say whether a response
    draft is ready. Track it as outstanding until the user acknowledges it.
@@ -91,14 +99,16 @@ up the schedule or conducting a review.
 Default all review runs to analysis and drafts. During setup, the user may grant
 a durable, narrowly scoped policy for low-risk actions such as posting an
 acknowledgment on an ordinary issue, providing a factual documentation answer,
-or requesting missing information. Record the exact allowed actions,
-repositories, item classes, and stop conditions in the scheduled task; anything
-not listed still requires fresh authorization.
+requesting missing information, or posting evidence-based, non-binding PR
+feedback. Record the exact allowed actions, repositories, item classes, and
+stop conditions in the scheduled task; anything not listed still requires
+fresh authorization. Treat a comment-only PR review as non-binding feedback;
+never infer permission to approve or request changes from permission to comment.
 
 Never infer durable permission from schedule creation or from a previous
-one-time approval. Require fresh authorization for security reports, pull
-request reviews, labels, milestones, closure, approval, merging, commits, and
-pushes. After any action, report its stable link or identifier and keep the item
-in the attention report until the user acknowledges it. Never claim a draft was
-posted and never repeat an action already recorded or visible in the current
-discussion.
+one-time approval. Require fresh authorization for security reports, approving
+or requesting changes on a pull request, labels, milestones, closure, merging,
+commits, and pushes. After any action, report its stable link or identifier and
+keep the item in the attention report until the user acknowledges it. Never
+claim a draft was posted and never repeat an action already recorded or visible
+in the current discussion.
