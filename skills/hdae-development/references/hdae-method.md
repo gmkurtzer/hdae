@@ -390,7 +390,9 @@ large gates. Each commit should have one understandable purpose and leave the
 tree testable when practical. Do not create noisy partial commits or split one
 tightly coupled behavior merely to increase commit count. Repository rules for
 sign-off, authorship, testing, and publication remain authoritative. A branch
-choice does not authorize pushing or opening a pull request.
+choice does not authorize pushing or opening a pull request unless an applicable
+scheduled-review gate policy explicitly grants those actions for that dedicated
+branch.
 
 ## Human gate-alignment conversation
 
@@ -405,6 +407,15 @@ sequence:
 4. show the coverage review below;
 5. ask what is missing or incorrectly scoped; and
 6. ask which gates may run as one batch and where human review is required.
+
+For a scheduled PR/issue review operating under a human-confirmed standing gate
+policy, perform and persist steps 1 through 5 without pausing. The saved policy
+replaces step 6 for qualifying work. Proceed autonomously unless a meaningful
+blocker requires human direction: ambiguous product or architecture intent,
+security or privacy risk, missing permission or credentials, scope outside the
+policy, destructive or irreversible impact, materially conflicting evidence,
+or failed verification with no credible safe in-scope path. Routine gate,
+branch, commit, and deterministic-test choices are not blockers.
 
 The coverage review considers each relevant surface:
 
@@ -462,6 +473,14 @@ failure cannot invalidate them. At the end, report each gate's passed, closed,
 failed, blocked, deferred, or still-open state and the evidence supporting it.
 Batch confirmation expires when the included gates finish or the agreed scope
 or checkpoint map changes.
+
+A scheduled PR/issue review may instead use a human-confirmed standing
+delegation for future gates matching its exact repository, issue classes, scope,
+risk, validation, delivery, and review boundaries. For each qualifying item,
+derive and persist the gate and checkpoint policy, then execute without another
+approval prompt. Stop when the item falls outside that delegation or meets a
+meaningful blocker defined above. This standing policy does not authorize
+unlisted external actions or weaken any acceptance criterion.
 
 ## Closed-loop execution
 

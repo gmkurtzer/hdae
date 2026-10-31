@@ -251,8 +251,9 @@ create a dedicated branch intended for a new pull request, and do not offer the
 current branch as an option. Record the originating issue or pull request in the
 gate and reference it in the new pull request. Use a closing keyword only when
 the work fully resolves an issue and the human's policy permits closure;
-otherwise use a non-closing reference. This delivery rule does not by itself
-authorize pushing the branch or opening the pull request.
+otherwise use a non-closing reference. This delivery rule alone does not
+authorize pushing the branch or opening the pull request; an applicable saved
+scheduled-review policy may grant those actions for its dedicated branches.
 
 Plan commits as part of the gate. A gate is large when it contains multiple
 independently reviewable changes, components, migrations, or risk boundaries.
@@ -260,7 +261,8 @@ Use multiple coherent commits for such a gate so each commit has one clear
 purpose and is testable where practical. Do not split tightly coupled work into
 artificial commits. Record the planned commits before work and the actual
 commits or material deviations before closure. Follow repository signing and
-commit conventions, and never infer permission to push or open a pull request.
+commit conventions. Never infer permission to push or open a pull request; use
+only an explicit current authorization or applicable saved policy.
 
 ## Align batches and checkpoints
 
@@ -282,12 +284,23 @@ permission. If the conversation already confirms the exact batch and map, do
 not ask again. Read the multi-gate procedure in
 [references/hdae-method.md](references/hdae-method.md) before running a batch.
 
+A scheduled `$pr-issue-review` task may instead carry a human-confirmed standing
+delegation for a narrowly defined class of future issue- or PR-originated gates.
+Within that recorded repository, risk, scope, validation, delivery, and review
+policy, create and execute qualifying gates without requesting approval again.
+This is not a general batch authorization and does not extend beyond the saved
+policy.
+
 ## Mandatory gate alignment
 
 This section applies only after the work has been determined to require a gate.
 Before implementation, align the gates with the human. Skip this only when the
 current conversation already contains explicit approval of the exact gate or
-batch, its acceptance criteria, and its checkpoint map.
+batch, its acceptance criteria, and its checkpoint map, or when a scheduled
+`$pr-issue-review` task has an applicable standing delegation as described
+above. Under that delegation, perform and persist the same alignment analysis,
+but do not pause merely to ask the human to approve the derived gate, branch,
+criteria, plan, or checkpoint map.
 
 1. Restate the outcome and important constraints in plain language.
 2. Ask focused questions about missing product behavior, architecture,
@@ -308,6 +321,16 @@ batch, its acceptance criteria, and its checkpoint map.
    gates may run, and where should I stop for review?”
 7. Wait for approval. Do not treat silence, general enthusiasm, or approval of
    the overall idea as approval of a gate batch or checkpoint map.
+
+For a delegated scheduled review, replace steps 6 and 7 with autonomous
+execution unless a meaningful blocker exists. Meaningful blockers include an
+ambiguous product or architecture decision, security or privacy risk, missing
+credentials or permission, work outside the saved scope or risk policy,
+destructive or irreversible impact, conflicting evidence that changes the
+intended result, or failed verification with no credible safe in-scope path.
+Gate numbering, the required dedicated branch, routine commit planning, and
+deterministic test selection are not blockers. Report and ask one focused
+question only when a blocker actually requires human direction.
 
 When creating or revising a gate, maximize deterministic verification. Map
 every acceptance criterion to an automated test, command, or reproducible

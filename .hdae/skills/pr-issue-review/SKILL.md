@@ -38,10 +38,13 @@ must use Review now; it must not create another schedule.
    and post non-binding PR feedback or ordinary issue responses. For actionable
    engineering issues, ask whether the task may create HDAE gates, which base
    branch to use when it differs from the repository default, and whether gate
-   execution is also authorized. Issue- and PR-originated work always uses a
-   dedicated branch intended for a new pull request.
-   Recommend repetition until acknowledgment and default validation, external
-   actions, gate creation, and gate execution to read-only or unapproved.
+   execution, signed commits, dedicated-branch pushes, and opening a new pull
+   request are authorized. Issue- and PR-originated work always uses a dedicated
+   branch intended for a new pull request. Recommend repetition until
+   acknowledgment and recommend automatic creation, execution, validation, and
+   PR delivery for objective work within a narrowly recorded policy. Require the
+   user to confirm that standing delegation once during setup; default anything
+   outside it to read-only or unapproved.
 4. Perform one bounded read-only review to prove access and preview the output.
    Correct access or query failures before scheduling.
 5. Build the recurring prompt with the exact repository, cadence-derived
@@ -69,7 +72,8 @@ Schedule creation authorizes creation of that schedule only. It does not
 authorize code execution, comments, reviews, gate creation or execution, labels,
 closures, merges, commits, or pushes. Any durable validation, external-action,
 or gate permission must be separately discussed, narrowly defined, and recorded
-in the saved task.
+in the saved task. Once recorded, do not request the same permission again on
+each scheduled run.
 
 Read [references/review-workflow.md](references/review-workflow.md) when setting
 up the schedule or conducting a review.
@@ -107,13 +111,13 @@ up the schedule or conducting a review.
    unchanged items. End with **No material activity**, **Maintainer attention
    recommended**, or **Review incomplete**, including the reason.
 
-## Actionable issue gates
+## Actionable review gates
 
-Actionable engineering feedback discovered by a scheduled review spans the
-review and implementation loops, so preserve it as an HDAE gate. Before creating
-one, inspect all gate lifecycle directories and the source issue to avoid a
-duplicate. Never modify a gate in `gates-done/`; new feedback after a closed gate
-requires a new gate.
+Actionable engineering feedback from an issue or PR discovered by a scheduled
+review spans the review and implementation loops, so preserve it as an HDAE
+gate. Before creating one, inspect all gate lifecycle directories and the source
+item to avoid a duplicate. Never modify a gate in `gates-done/`; new feedback
+after a closed gate requires a new gate.
 
 When the saved gate policy authorizes creation, use `$hdae-development` in
 Maintain mode to create the smallest gate in `hdae/gates-todo/`. Trace it to the
@@ -121,17 +125,27 @@ issue and record the goal, scope and non-goals, dependencies, deterministic
 acceptance evidence, delivery strategy, review policy, and exact next action.
 Create a dedicated branch intended for a new pull request and record the source
 issue or PR in the gate; never offer the current branch for this work. The new
-pull request must reference the source item, using a closing keyword only when
-authorized and fully resolved. Ask the user when the issue leaves any gate
-boundary or result materially unclear. If creation is not authorized, present
-the proposed gate and request permission instead of writing it.
+pull request must use a non-closing reference to the source item. Closing the
+source requires fresh authorization. Ask the user when the issue leaves any
+gate boundary or result materially unclear. If creation is not authorized,
+present the proposed gate and request permission instead of writing it.
 
-Gate creation does not by itself authorize implementation. When execution is
-also authorized and a real execution path is available, queue or begin the gate
-through the normal HDAE workflow and tell the user the gate was created and will
-be worked on. Otherwise report that it was created but awaits alignment,
-execution authorization, or an available worker. Never promise future work
-unless it has actually been authorized and queued or started.
+Gate creation does not by itself authorize implementation. When the saved policy
+delegates execution, autonomously align and persist the gate, create its branch,
+implement and verify the bounded fix, make the planned signed commits, and push
+or open the referencing pull request only when those actions are also recorded
+as authorized. Do not pause for routine approval of the derived gate, branch,
+criteria, plan, or checkpoint map. Tell the user what was created and whether
+execution or PR delivery is active or complete.
+
+Stop and ask one focused question only for a meaningful blocker: an ambiguous
+product or architecture decision, security or privacy risk, missing credentials
+or permission, work outside the saved scope or risk policy, destructive or
+irreversible impact, conflicting evidence that changes the intended result, or
+failed verification with no credible safe in-scope path. Gate numbering,
+dedicated-branch creation, routine commit planning, and deterministic test
+selection are not blockers. Never promise future work unless it has actually
+been authorized and queued or started.
 
 ## External actions
 
@@ -145,9 +159,11 @@ fresh authorization. Treat a comment-only PR review as non-binding feedback;
 never infer permission to approve or request changes from permission to comment.
 
 Never infer durable permission from schedule creation or from a previous
-one-time approval. Require fresh authorization for security reports, approving
+one-time approval. A saved gate policy may explicitly authorize signed commits,
+pushes of its dedicated branches, and opening new pull requests that reference
+their source items. Require fresh authorization for security reports, approving
 or requesting changes on a pull request, labels, milestones, closure, merging,
-commits, and pushes. After any action, report its stable link or identifier and
-keep the item in the attention report until the user acknowledges it. Never
-claim a draft was posted and never repeat an action already recorded or visible
-in the current discussion.
+or any commit, push, or PR outside that policy. After any action, report its
+stable link or identifier and keep the item in the attention report until the
+user acknowledges it. Never claim a draft was posted and never repeat an action
+already recorded or visible in the current discussion.
