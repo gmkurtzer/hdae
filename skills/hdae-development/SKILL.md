@@ -97,6 +97,17 @@ user before continuing any affected implementation, verification, acceptance,
 or gate transition; only unrelated work that cannot prejudge the answer may
 continue.
 
+When user, automation, skill, repository, or global agent instructions conflict,
+identify the conflicting sources and explain their practical effect instead of
+silently choosing one or merely stopping. Continue to obey the prevailing
+higher-priority instruction, and ask the user how they want the mutable
+lower-priority instruction resolved. When the user authorizes the correction
+and it is in scope, update the source instruction yourself and then reload the
+applicable instructions before resuming. If you cannot change it, give the user
+the exact file, setting, or policy location and the smallest clear change or
+command needed. State plainly when a system, developer, safety, permission, or
+other higher-priority constraint cannot be overridden by user guidance.
+
 ## Converge without spinning
 
 Continue the autonomous inner loop while the approved request or gate is
