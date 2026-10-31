@@ -36,11 +36,13 @@ must use Review now; it must not create another schedule.
    convention, and whether outstanding attention items should repeat until
    acknowledged. Separately ask whether the task may run isolated PR validation
    and post non-binding PR feedback or ordinary issue responses. For actionable
-   engineering issues, ask whether the task may create HDAE gates, which base
-   branch to use when it differs from the repository default, and whether gate
-   execution, signed commits, dedicated-branch pushes, and opening a new pull
-   request are authorized. Issue- and PR-originated work always uses a dedicated
-   branch intended for a new pull request. Recommend repetition until
+   engineering issues, ask whether the task may create and execute HDAE gates
+   and which base branch to use when it differs from the repository default.
+   Issue- and PR-originated work always uses a dedicated branch intended for a
+   new pull request. Automatic remediation includes signed commits, pushing
+   that dedicated branch, and opening or updating its pull request; do not split
+   those routine delivery steps into separate permission questions. Recommend
+   repetition until
    acknowledgment and recommend automatic creation, execution, validation, and
    PR delivery for objective work within a narrowly recorded policy. Require the
    user to confirm that standing delegation once during setup; default anything
@@ -129,17 +131,21 @@ Maintain mode to create the smallest gate in `hdae/gates-todo/`. Trace it to the
 issue and record the goal, scope and non-goals, dependencies, deterministic
 acceptance evidence, delivery strategy, review policy, and exact next action.
 Create a dedicated branch intended for a new pull request and record the source
-issue or PR in the gate; never offer the current branch for this work. The new
-pull request must use a non-closing reference to the source item. Closing the
-source requires fresh authorization. Ask the user when the issue leaves any
+issue or PR in the gate; never offer the current branch for this work. Reference
+the source item in the new pull request. Use a closing keyword or close a source
+issue only when the saved automatic-management policy authorizes it; otherwise
+use a non-closing reference. Never close a pull request. Ask the user when the
+issue leaves any
 gate boundary or result materially unclear. If creation is not authorized,
 present the proposed gate and request permission instead of writing it.
 
 Gate creation does not by itself authorize implementation. When the saved policy
-delegates execution, autonomously align and persist the gate, create its branch,
-implement and verify the bounded fix, make the planned signed commits, and push
-or open the referencing pull request only when those actions are also recorded
-as authorized. Do not pause for routine approval of the derived gate, branch,
+delegates automatic execution, autonomously align and persist the gate, create
+its branch, implement and verify the bounded fix, make the planned signed
+commits, push the dedicated branch, and open or update the referencing pull
+request. Never push directly to the repository's default branch, including
+`main`, and never close or merge a pull request. Do not pause for routine
+approval of the derived gate, branch,
 criteria, plan, or checkpoint map. Tell the user what was created and whether
 execution or PR delivery is active or complete.
 
@@ -161,21 +167,23 @@ privately.
 
 ## External actions
 
-Default all review runs to analysis and drafts. During setup, the user may grant
-a durable, narrowly scoped policy for low-risk actions such as posting an
-acknowledgment on an ordinary issue, providing a factual documentation answer,
-requesting missing information, or posting evidence-based, non-binding PR
-feedback. Record the exact allowed actions, repositories, item classes, and
-stop conditions in the scheduled task; anything not listed still requires
-fresh authorization. Treat a comment-only PR review as non-binding feedback;
-never infer permission to approve or request changes from permission to comment.
+Default monitoring-only review runs to analysis and drafts. During setup, the
+user may grant a durable, narrowly scoped automatic-management policy. Record
+the repositories, item classes, allowed management actions, validation limits,
+and stop conditions in the scheduled task. A request for automatic issue and PR
+management authorizes the normal actions named by that policy, including
+comments or reviews, issue metadata and state changes, signed commits, pushes
+to dedicated branches, and opening or updating pull requests. It never
+authorizes a direct push to the repository's default branch, closing a pull
+request, or merging a pull request.
 
 Never infer durable permission from schedule creation or from a previous
-one-time approval. A saved gate policy may explicitly authorize signed commits,
-pushes of its dedicated branches, and opening new pull requests that reference
-their source items. Require fresh authorization for security reports, approving
-or requesting changes on a pull request, labels, milestones, closure, merging,
-or any commit, push, or PR outside that policy. After any action, report its
+one-time approval. An explicit proactive-remediation or automatic-management
+request is durable permission when it is recorded in the saved task. Within
+that policy, dedicated-branch pushes and opening or updating pull requests are
+expected delivery steps, not blockers. Require fresh authorization for actions
+outside the saved policy. Never push directly to the default branch, close a
+pull request, or merge a pull request. After any action, report its
 stable link or identifier and keep the item in the attention report until the
 user acknowledges it. Never claim a draft was posted and never repeat an action
 already recorded or visible in the current discussion.

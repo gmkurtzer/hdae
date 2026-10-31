@@ -251,9 +251,11 @@ create a dedicated branch intended for a new pull request, and do not offer the
 current branch as an option. Record the originating issue or pull request in the
 gate and reference it in the new pull request. Use a closing keyword only when
 the work fully resolves an issue and the human's policy permits closure;
-otherwise use a non-closing reference. This delivery rule alone does not
-authorize pushing the branch or opening the pull request; an applicable saved
-scheduled-review policy may grant those actions for its dedicated branches.
+otherwise use a non-closing reference. A saved automatic-management or
+proactive-remediation policy authorizes pushing the dedicated branch and
+opening or updating its pull request as routine delivery; do not ask again.
+Never push directly to the repository's default branch, including `main`, and
+never close or merge a pull request.
 
 Plan commits as part of the gate. A gate is large when it contains multiple
 independently reviewable changes, components, migrations, or risk boundaries.
@@ -261,8 +263,9 @@ Use multiple coherent commits for such a gate so each commit has one clear
 purpose and is testable where practical. Do not split tightly coupled work into
 artificial commits. Record the planned commits before work and the actual
 commits or material deviations before closure. Follow repository signing and
-commit conventions. Never infer permission to push or open a pull request; use
-only an explicit current authorization or applicable saved policy.
+commit conventions. Outside an automatic-management or proactive-remediation
+policy, use only an explicit current authorization to push or open a pull
+request.
 
 ## Align batches and checkpoints
 
