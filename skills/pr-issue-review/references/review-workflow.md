@@ -35,6 +35,11 @@ makes signed commits, and delivers a referencing pull request. Confirm it once
 during setup and encode its repository, scope, risk, validation, delivery,
 review, and stopping boundaries in the saved task.
 
+When the user's setup request explicitly asks for automatic or proactive
+remediation, treat that request as the confirmation and encode this standing
+delegation directly. Do not ask a redundant permission question and do not save
+a read-only prompt that contradicts the requested behavior.
+
 ## Persistent attention and acknowledgment
 
 The activity lookback finds new issue changes; it must not expire unresolved

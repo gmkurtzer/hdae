@@ -45,6 +45,9 @@ must use Review now; it must not create another schedule.
    PR delivery for objective work within a narrowly recorded policy. Require the
    user to confirm that standing delegation once during setup; default anything
    outside it to read-only or unapproved.
+   If the setup request itself explicitly asks for automatic or proactive
+   remediation, that request is the confirmation: encode the standing policy in
+   the saved task and do not ask again or silently downgrade it to read-only.
 4. Perform one bounded read-only review to prove access and preview the output.
    Correct access or query failures before scheduling.
 5. Build the recurring prompt with the exact repository, cadence-derived
@@ -73,7 +76,9 @@ authorize code execution, comments, reviews, gate creation or execution, labels,
 closures, merges, commits, or pushes. Any durable validation, external-action,
 or gate permission must be separately discussed, narrowly defined, and recorded
 in the saved task. Once recorded, do not request the same permission again on
-each scheduled run.
+each scheduled run. An explicit request for automatic or proactive remediation
+is durable permission for the bounded policy described in that request, not
+mere schedule creation.
 
 Read [references/review-workflow.md](references/review-workflow.md) when setting
 up the schedule or conducting a review.
