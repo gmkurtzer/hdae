@@ -249,7 +249,9 @@ intended.
 Work originating from an issue or pull-request review is an exception: always
 create a dedicated branch intended for a new pull request, and do not offer the
 current branch as an option. Record the originating issue or pull request in the
-gate and reference it in the new pull request. Use a closing keyword only when
+gate and reference it in the new pull request. Name the branch
+`hdae/<descriptive-slug>` unless the human or repository defines another branch
+prefix. Use a closing keyword only when
 the work fully resolves an issue and the human's policy permits closure;
 otherwise use a non-closing reference. A saved automatic-management or
 proactive-remediation policy authorizes pushing the dedicated branch and

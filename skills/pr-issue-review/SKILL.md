@@ -134,8 +134,9 @@ Maintain mode to create the smallest gate in `hdae/gates-todo/`. Trace it to the
 issue and record the goal, scope and non-goals, dependencies, deterministic
 acceptance evidence, delivery strategy, review policy, and exact next action.
 Create a dedicated branch intended for a new pull request and record the source
-issue or PR in the gate; never offer the current branch for this work. Reference
-the source item in the new pull request. Use a closing keyword or close a source
+issue or PR in the gate; never offer the current branch for this work. Name it
+`hdae/<descriptive-slug>` unless the saved policy specifies another prefix.
+Reference the source item in the new pull request. Use a closing keyword or close a source
 issue only when the saved automatic-management policy authorizes it; otherwise
 use a non-closing reference. Never close a pull request. Ask the user when the
 issue leaves any gate boundary or result materially unclear. If creation is not authorized,
