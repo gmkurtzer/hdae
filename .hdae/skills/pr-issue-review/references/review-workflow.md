@@ -35,6 +35,12 @@ makes signed commits, and delivers a referencing pull request. Confirm it once
 during setup and encode its repository, scope, risk, validation, delivery,
 review, and stopping boundaries in the saved task.
 
+Define the delivery unit as one independently reviewable issue fix, one gate,
+one dedicated branch, and one pull request. Combine issues only when they share
+the same root cause or an inseparable change and verification set, and require
+the gate to record that relationship. Require the remote branch and stable pull
+request URL before the gate or scheduled run can report successful remediation.
+
 When the user's setup request explicitly asks for automatic or proactive
 remediation, treat that request as the confirmation and encode this standing
 delegation directly. Do not ask a redundant permission question and do not save
@@ -157,16 +163,29 @@ branch intended for a new pull request; never offer the current branch. Record
 the source issue or PR in the gate, and require the new pull request to reference
 it. Use a closing keyword or close a source issue only when the saved
 automatic-management policy authorizes it. Never close a pull request.
+
+Before new remediation, resume every authorized gate with local implementation
+but no open pull request and finish its delivery. Use one gate, one dedicated
+branch, and one pull request for each independently reviewable issue fix. Never
+combine unrelated issues or gates. Combine related issues only when they share
+the same root cause or an inseparable change and verification set; create one
+combined gate and record the reason.
+
 If gate execution is delegated, autonomously align the gate, implement and
 verify the bounded fix, make its planned signed commits, push the dedicated
-branch, and open or update the referencing pull request. Never push directly to
-the default branch, close a pull request, or merge a pull request.
+branch, open or update the referencing pull request, record its stable URL in
+the gate, and notify the user. Local branches and commits are not completion.
+Do not move the gate to gates-done or report successful remediation until the
+remote branch and open pull request exist. On delivery failure, keep the gate in
+gates-todo and report Review incomplete with the exact blocker. Never push
+directly to the default branch, close a pull request, or merge a pull request.
 Do not ask for routine approval of the derived gate, branch, criteria, plan, or
 checkpoint map.
 
 Stop only for a meaningful blocker: an ambiguous product or architecture
-decision, security or privacy risk, missing credential or permission, work
-outside the saved scope or risk policy, destructive or irreversible impact,
+decision, nonpublic security or privacy risk that cannot be handled safely
+under the saved policy, missing credential or permission, work outside the
+saved scope or risk policy, destructive or irreversible impact,
 conflicting evidence that changes the intended result, or failed verification
 with no credible safe in-scope path. Gate numbering, dedicated-branch creation,
 routine commit planning, and deterministic test selection are not blockers.
@@ -249,7 +268,9 @@ Start with the repository and exact review window. For each material item show:
 
 For an actionable issue, also show the linked existing or newly created HDAE
 gate, its branch and review policy, and whether execution is queued, active, or
-awaiting a named authorization or resource.
+awaiting a named authorization or resource. A delivered gate must include its
+remote branch and stable pull-request URL. Missing delivery requires **Review
+incomplete**, not a successful-remediation claim.
 
 End with exactly one operational summary:
 

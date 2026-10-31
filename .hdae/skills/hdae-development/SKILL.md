@@ -257,6 +257,21 @@ opening or updating its pull request as routine delivery; do not ask again.
 Never push directly to the repository's default branch, including `main`, and
 never close or merge a pull request.
 
+Use one gate, one dedicated branch, and one pull request for each independently
+reviewable issue fix. Do not put unrelated gates or issues on the same branch or
+pull request. Combine related issues into one gate and pull request only when
+they share the same root cause or inseparable change and verification set;
+record that relationship and the reason separate delivery would be misleading
+or unsafe in the gate.
+
+Under an automatic-management or proactive-remediation policy, local commits
+are not delivery and do not complete the gate. Finish the loop by pushing the
+dedicated branch, opening or updating the pull request, recording its stable URL
+in the gate, and notifying the human. Keep the gate in `gates-todo/` and report
+delivery as incomplete if the remote branch or pull request is missing. Retry a
+recoverable delivery failure with a materially different action; stop only for
+a meaningful credential, permission, provider, or policy blocker.
+
 Plan commits as part of the gate. A gate is large when it contains multiple
 independently reviewable changes, components, migrations, or risk boundaries.
 Use multiple coherent commits for such a gate so each commit has one clear
@@ -327,8 +342,9 @@ criteria, plan, or checkpoint map.
 
 For a delegated scheduled review, replace steps 6 and 7 with autonomous
 execution unless a meaningful blocker exists. Meaningful blockers include an
-ambiguous product or architecture decision, security or privacy risk, missing
-credentials or permission, work outside the saved scope or risk policy,
+ambiguous product or architecture decision, nonpublic security or privacy risk
+that cannot be handled safely under the saved policy, missing credentials or
+permission, work outside the saved scope or risk policy,
 destructive or irreversible impact, conflicting evidence that changes the
 intended result, or failed verification with no credible safe in-scope path.
 Gate numbering, the required dedicated branch, routine commit planning, and

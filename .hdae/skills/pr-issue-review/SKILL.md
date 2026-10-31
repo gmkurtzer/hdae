@@ -94,6 +94,9 @@ up the schedule or conducting a review.
    request through the authenticated connector or read-only `gh` commands.
    Review each open PR at its current head. Do not keep a historical ledger of
    evaluated PRs, and do not include closed or merged PRs by default.
+   Before starting new remediation, inspect open HDAE gates and local or remote
+   delivery branches. Resume any authorized gate that has implementation but no
+   open pull request, and finish its delivery loop first.
 3. Inspect every open PR even when unchanged, but suppress its report when the
    current head has no finding requiring attention. Suppress unchanged,
    automated, duplicate, or low-signal issue activity unless it is an unresolved
@@ -135,9 +138,15 @@ issue or PR in the gate; never offer the current branch for this work. Reference
 the source item in the new pull request. Use a closing keyword or close a source
 issue only when the saved automatic-management policy authorizes it; otherwise
 use a non-closing reference. Never close a pull request. Ask the user when the
-issue leaves any
-gate boundary or result materially unclear. If creation is not authorized,
+issue leaves any gate boundary or result materially unclear. If creation is not authorized,
 present the proposed gate and request permission instead of writing it.
+
+Partition work before implementation. Use one gate, one dedicated branch, and
+one pull request for each independently reviewable issue fix. Do not combine
+unrelated issue fixes or gates. Combine related issues only when they share the
+same root cause or an inseparable change and verification set; create one gate
+for that combined work and record why separate delivery would be misleading or
+unsafe.
 
 Gate creation does not by itself authorize implementation. When the saved policy
 delegates automatic execution, autonomously align and persist the gate, create
@@ -145,13 +154,23 @@ its branch, implement and verify the bounded fix, make the planned signed
 commits, push the dedicated branch, and open or update the referencing pull
 request. Never push directly to the repository's default branch, including
 `main`, and never close or merge a pull request. Do not pause for routine
-approval of the derived gate, branch,
-criteria, plan, or checkpoint map. Tell the user what was created and whether
+approval of the derived gate, branch, criteria, plan, or checkpoint map. Tell
+the user what was created and whether
 execution or PR delivery is active or complete.
 
+Treat that sequence as one required loop: read and classify the source, create
+the gate, create its branch, execute and verify the gate, commit, push, open the
+pull request, record the stable pull-request URL in the gate, and notify the
+user. Local branches and commits are intermediate state, not completion. A gate
+cannot move to `gates-done/`, and the run cannot report successful remediation,
+until its remote branch and open pull request both exist. If delivery fails,
+keep the gate in `gates-todo/`, report **Review incomplete** with the exact
+failure, and retry when a credible in-policy recovery exists.
+
 Stop and ask one focused question only for a meaningful blocker: an ambiguous
-product or architecture decision, security or privacy risk, missing credentials
-or permission, work outside the saved scope or risk policy, destructive or
+product or architecture decision, nonpublic security or privacy risk that
+cannot be handled safely under the saved policy, missing credentials or
+permission, work outside the saved scope or risk policy, destructive or
 irreversible impact, conflicting evidence that changes the intended result, or
 failed verification with no credible safe in-scope path. Gate numbering,
 dedicated-branch creation, routine commit planning, and deterministic test
